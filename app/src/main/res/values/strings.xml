@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tuner</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="radio_array">
+        <item>GTA_III</item>
+        <item>GTA_VC</item>
+        <item>San Andreas</item>
+        <item>GTA_IV</item>
+    </string-array>
+
+    <string name="title_activity_tuner_main">Tuner</string>
+    
+    <string name="song_artist_default_text">[SONG_NAME]</string>
+    <string name="song_name_default_text">[SONG_NAME]</string>
+    
+    <string name="station_dj_default_text">[STATION_DJ]</string>
+    <string name="station_genre_default_text">[STATION_GENRE]</string>
+    <string name="station_name_default_text">[]STATION_NAME]</string>
+
+    <string name="next_song_content_desc">Next Song</string>
+    <string name="play_pause_content_desc">Play/Pause</string>
+    <string name="station_icon_content_desc">Station Icon</string>
+
+    <string name="son_item_song_name_default">[SONG_NAME]</string>
+
+</resources>
