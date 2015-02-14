@@ -18,9 +18,10 @@ public class StationListAdapter implements ListAdapter
     private Activity context;
 	private RadioFragment fragmentParent;
 
-    public StationListAdapter( Activity _context )
+    public StationListAdapter( Activity _context, RadioFragment _fragmentParent )
     {
         this.context = _context;
+        this.fragmentParent = _fragmentParent;
     }
 
 	@Override
@@ -93,16 +94,17 @@ public class StationListAdapter implements ListAdapter
 		_convertView.setOnClickListener( new StationListOnClickListener( this.fragmentParent.radioIndex, 
 				_position, this.fragmentParent.stationList ) );
 
-        _convertView.setOnLongClickListener( new View.OnLongClickListener()
+        final int stationIndex = _position;
+        /*_convertView.setOnLongClickListener( new View.OnLongClickListener()
         {
             @Override
             public boolean onLongClick( View _view )
             {
                 FragmentManager fm = context.getFragmentManager();
-                SongListFragment songListFragment = new SongListFragment( context, station );
+                SongListFragment songListFragment = SongListFragment.newInstance( RadioMaster.instance.currentRadioIndex, stationIndex );
                 return true;
             }
-        });
+        });*/
 
 		return _convertView;
 	}

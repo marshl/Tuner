@@ -29,9 +29,7 @@ public class RadioFragment extends Fragment
 				container, false );
 		
 		this.stationList = (ListView)rootView.findViewById( R.id.station_list );
-		StationListAdapter stationListAdapter = new StationListAdapter( this.context );
-		this.stationList.setAdapter( stationListAdapter );
-		
+		this.stationList.setAdapter( new StationListAdapter( this.context, this ) );
 		return rootView;
 	}
 }

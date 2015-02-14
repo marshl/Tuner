@@ -18,9 +18,9 @@ public class SongListAdapter implements ListAdapter
     private Activity context;
     private Station station;
 
-    public SongListAdapter( Activity _context, Station _station )
+    public SongListAdapter( Station _station )
     {
-        this.context = _context;
+        this.context = RadioMaster.instance.context;
         this.station = _station;
     }
 

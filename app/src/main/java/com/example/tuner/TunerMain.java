@@ -109,6 +109,24 @@ public class TunerMain extends Activity
 	    this.onSoundItemChange();
 	}
 
+    protected void onResume()
+    {
+        super.onResume();
+        RadioMaster.instance.context = this;
+    }
+
+    protected void onPause()
+    {
+        super.onPause();
+        RadioMaster.instance.context = this;
+    }
+
+    protected void onDestroy()
+    {
+        RadioMaster.instance.context = this;
+        super.onDestroy();
+    }
+
 	public void onPlayPauseButtonClick( View _view )
 	{
 		final ImageButton playPauseButton = (ImageButton)this.findViewById( R.id.play_pause_button );

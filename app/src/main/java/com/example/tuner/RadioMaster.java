@@ -33,7 +33,7 @@ public class RadioMaster
 	}
 	private SOUND_TYPE lastPlayedSoundType = SOUND_TYPE.SONG;
 
-	private Activity context;
+	public Activity context;
 	public ArrayList<Radio> radioList = new ArrayList<Radio>();
 	public int currentRadioIndex = 0;
 	
