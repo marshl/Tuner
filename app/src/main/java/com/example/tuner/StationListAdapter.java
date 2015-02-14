@@ -2,7 +2,9 @@ package com.example.tuner;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.database.DataSetObserver;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -95,16 +97,18 @@ public class StationListAdapter implements ListAdapter
 				_position, this.fragmentParent.stationList ) );
 
         final int stationIndex = _position;
-        /*_convertView.setOnLongClickListener( new View.OnLongClickListener()
+        _convertView.setOnLongClickListener( new View.OnLongClickListener()
         {
             @Override
             public boolean onLongClick( View _view )
             {
                 FragmentManager fm = context.getFragmentManager();
                 SongListFragment songListFragment = SongListFragment.newInstance( RadioMaster.instance.currentRadioIndex, stationIndex );
+                songListFragment.show( fm, "Pick a song" );
+                fm.beginTransaction( );
                 return true;
             }
-        });*/
+        });
 
 		return _convertView;
 	}

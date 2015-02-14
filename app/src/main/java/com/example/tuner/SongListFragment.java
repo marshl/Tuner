@@ -1,12 +1,15 @@
 package com.example.tuner;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Bundle;
-import android.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
-public class SongListFragment extends ListFragment
+public class SongListFragment extends DialogFragment
 {
     private static final String RADIO_ID_PARAM = "RADIO";
     private static final String STATION_ID_PARAM = "STATION";
@@ -39,13 +42,30 @@ public class SongListFragment extends ListFragment
         if ( this.getArguments() != null )
         {
             int radioIndex   = getArguments().getInt( RADIO_ID_PARAM );
-            int stationIndex = getArguments().getInt( STATION_ID_PARAM );
+            int stationIndex = getArguments().getInt(STATION_ID_PARAM);
             this.station = RadioMaster.instance.radioList.get( radioIndex ).stationList.get( stationIndex );
         }
-
-        this.setListAdapter( new SongListAdapter( this.station ) );
     }
 
+    @Override
+    public View onCreateView( LayoutInflater _inflater, ViewGroup _container, Bundle _savedInstanceState )
+    {
+        View rootView = _inflater.inflate( R.layout.fragment_song_list, _container, false );
+
+        ListView listView = (ListView)rootView.findViewById( R.id.song_list_view );
+        listView.setAdapter(new SongListAdapter(this.station));
+        listView.setOnItemClickListener(
+            new AdapterView.OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+                {
+
+                }
+            }
+        );
+        return rootView;
+    }
 
     @Override
     public void onAttach( Activity _activity )
@@ -69,19 +89,6 @@ public class SongListFragment extends ListFragment
     }
 
 
-    @Override
-    public void onListItemClick( ListView _listView, View _view, int _position, long _id )
-    {
-        super.onListItemClick( _listView, _view, _position, _id);
-
-        if ( this.interactionListener != null )
-        {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            this.interactionListener.onFragmentInteraction( _position );
-        }
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -94,8 +101,7 @@ public class SongListFragment extends ListFragment
      */
     public interface OnFragmentInteractionListener
     {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction( int _position );
+        public void onFragmentInteraction( int _songIndex );
     }
 
 }

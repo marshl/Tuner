@@ -14,7 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class TunerMain extends Activity
+public class TunerMain extends Activity implements SongListFragment.OnFragmentInteractionListener
 {
 	private RadioPagerAdapter radioPagerAdapter;
 	private ViewPager viewPager;
@@ -155,7 +155,13 @@ public class TunerMain extends Activity
 		}
 	}
 
-	public class RadioPagerAdapter extends FragmentPagerAdapter
+    @Override
+    public void onFragmentInteraction( int _songIndex )
+    {
+
+    }
+
+    public class RadioPagerAdapter extends FragmentPagerAdapter
 	{
 		public RadioPagerAdapter( FragmentManager fm )
 		{
