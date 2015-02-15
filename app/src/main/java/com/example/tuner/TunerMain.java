@@ -171,10 +171,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 		@Override
 		public Fragment getItem( int _position )
 		{
-			RadioFragment fragment = new RadioFragment();
-			fragment.radioIndex = _position;
-			fragment.radio = RadioMaster.instance.radioList.get( _position );
-			return fragment;
+			return RadioFragment.newInstance( _position );
 		}
 
 		@Override

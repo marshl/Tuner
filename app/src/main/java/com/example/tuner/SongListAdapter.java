@@ -51,13 +51,13 @@ public class SongListAdapter implements ListAdapter
     @Override
     public int getCount()
     {
-        return this.station.songList.size();
+        return this.station.getSongCount();
     }
 
     @Override
     public Object getItem( int _i )
     {
-        return this.station.songList.size();
+        return this.station.getSongCount();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SongListAdapter implements ListAdapter
             _convertView = layoutInflater.inflate( R.layout.song_list_item, _parent, false );
         }
 
-        final Song song = this.station.songList.get( _position );
+        final Song song = this.station.getSongAtIndex( _position );
 
         final TextView nameTextView = (TextView)_convertView.findViewById( R.id.song_item_song_name );
         nameTextView.setText( song.name );
@@ -102,6 +102,6 @@ public class SongListAdapter implements ListAdapter
     @Override
     public boolean isEmpty()
     {
-        return this.station.songList.isEmpty();
+        return !this.station.hasSong();
     }
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -28,7 +29,8 @@ public class Station
 	public Bitmap iconData;
 	public boolean fullTrack = false;
 	
-	public ArrayList<Song> songList = new ArrayList<Song>();
+	private ArrayList<Song> songList = new ArrayList<Song>();
+    private int songIndex;
 	public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
 	
 	public Station( Radio _parentRadio, String _dir ) throws Exception
@@ -50,8 +52,9 @@ public class Station
 		this.miscFileMap.put( SOUND_TYPE.TO_NEWS, new ArrayList<File>() );
 		
 		this.loadXml();
-		
-		Collections.shuffle( this.songList );
+        Random rand = new Random();
+        this.songIndex = rand.nextInt() % this.songList.size();
+
 		for ( Entry<SOUND_TYPE, ArrayList<File>> entry : this.miscFileMap.entrySet() )
 		{
 			Collections.shuffle( entry.getValue() );
@@ -231,10 +234,9 @@ public class Station
 	
 	public Song getNextSong()
 	{
-		Song song = this.songList.get( 0 );
-		this.songList.remove( 0 );
-		this.songList.add( song );
-		return song;
+        Song song = this.getSongAtIndex( this.songIndex );
+        this.songIndex = (this.songIndex == this.songList.size() ) ? 0 : this.songIndex + 1;
+        return song;
 	}
 	
 	public File getNextMiscFile( SOUND_TYPE _soundType )
@@ -251,4 +253,19 @@ public class Station
 		list.add( file );
 		return file;
 	}
+
+    public boolean hasSong()
+    {
+        return !this.songList.isEmpty();
+    }
+
+    public int getSongCount()
+    {
+        return this.songList.size();
+    }
+
+    public Song getSongAtIndex( int _position )
+    {
+        return this.songList.get( _position );
+    }
 }

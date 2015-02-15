@@ -97,15 +97,15 @@ public class StationListAdapter implements ListAdapter
 				_position, this.fragmentParent.stationList ) );
 
         final int stationIndex = _position;
+        final int radioIndex = this.fragmentParent.radioIndex;
         _convertView.setOnLongClickListener( new View.OnLongClickListener()
         {
             @Override
             public boolean onLongClick( View _view )
             {
                 FragmentManager fm = context.getFragmentManager();
-                SongListFragment songListFragment = SongListFragment.newInstance( RadioMaster.instance.currentRadioIndex, stationIndex );
+                SongListFragment songListFragment = SongListFragment.newInstance( radioIndex, stationIndex );
                 songListFragment.show( fm, "Pick a song" );
-                fm.beginTransaction( );
                 return true;
             }
         });

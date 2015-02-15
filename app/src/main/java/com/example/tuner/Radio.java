@@ -33,8 +33,10 @@ public class Radio
 		this.directory = _directory;
 		
 		this.loadXml();
-		
+
 		Collections.shuffle( this.advertList );
+        Collections.shuffle( this.newsList );
+        Collections.shuffle( this.weatherList );
 	}
 	
 	private void loadXml() throws Exception
@@ -191,7 +193,7 @@ public class Radio
 		case NEWS:
 			return this.newsList.size() > 0;
 		case SONG:
-			return station.songList.size() > 0;
+			return station.hasSong();
 		case TIME:
 			return station.miscFileMap.get( SOUND_TYPE.TIME ).size() > 0;
 		case WEATHER:

@@ -10,6 +10,8 @@ import android.widget.ListView;
 
 public class RadioFragment extends Fragment
 {
+    private static String RADIO_ID_PARAM = "RADIO";
+
     public Activity context;
 	public int radioIndex;
 	public Radio radio;
@@ -19,6 +21,27 @@ public class RadioFragment extends Fragment
     public RadioFragment()
     {
 
+    }
+
+    public static RadioFragment newInstance( int _radioIndex )
+    {
+        RadioFragment fragment = new RadioFragment();
+        Bundle args = new Bundle();
+        args.putInt( RADIO_ID_PARAM, _radioIndex );
+        fragment.setArguments( args );
+        return fragment;
+    }
+
+    @Override
+    public void onCreate( Bundle _savedInstanceState )
+    {
+        super.onCreate( _savedInstanceState );
+
+        if ( this.getArguments() != null )
+        {
+            this.radioIndex  = getArguments().getInt( RADIO_ID_PARAM );
+            this.radio = RadioMaster.instance.radioList.get( radioIndex );
+        }
     }
 
 	@Override

@@ -18,7 +18,6 @@ public class SongListFragment extends DialogFragment
 
     private Station station;
 
-
     public static SongListFragment newInstance( int _radioIndex, int _stationIndex )
     {
         SongListFragment fragment = new SongListFragment();
@@ -53,7 +52,7 @@ public class SongListFragment extends DialogFragment
         View rootView = _inflater.inflate( R.layout.fragment_song_list, _container, false );
 
         ListView listView = (ListView)rootView.findViewById( R.id.song_list_view );
-        listView.setAdapter(new SongListAdapter(this.station));
+        listView.setAdapter(new SongListAdapter( this.station ));
         listView.setOnItemClickListener(
             new AdapterView.OnItemClickListener()
             {
