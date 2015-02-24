@@ -11,11 +11,15 @@ import android.widget.ListView;
 
 public class SongListFragment extends DialogFragment
 {
+    private Activity context;
+
     private static final String RADIO_ID_PARAM = "RADIO";
     private static final String STATION_ID_PARAM = "STATION";
 
     private OnFragmentInteractionListener interactionListener;
 
+    private int radioIndex;
+    private int stationIndex;
     private Station station;
 
     public static SongListFragment newInstance( int _radioIndex, int _stationIndex )
@@ -40,9 +44,9 @@ public class SongListFragment extends DialogFragment
 
         if ( this.getArguments() != null )
         {
-            int radioIndex   = getArguments().getInt( RADIO_ID_PARAM );
-            int stationIndex = getArguments().getInt(STATION_ID_PARAM);
-            this.station = RadioMaster.instance.radioList.get( radioIndex ).stationList.get( stationIndex );
+            this.radioIndex   = getArguments().getInt( RADIO_ID_PARAM );
+            this.stationIndex = getArguments().getInt(STATION_ID_PARAM);
+            this.station = RadioMaster.instance.getRadio( this.radioIndex ).getStation( this.stationIndex );
         }
     }
 
@@ -53,11 +57,20 @@ public class SongListFragment extends DialogFragment
 
         ListView listView = (ListView)rootView.findViewById( R.id.song_list_view );
         listView.setAdapter(new SongListAdapter( this.station ));
-        listView.setOnItemClickListener(
-            new AdapterView.OnItemClickListener()
+
+        listView.setOnItemSelectedListener
+        (
+            new AdapterView.OnItemSelectedListener()
             {
                 @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    TunerMain main = (TunerMain)context;
+                    main.selectSong( radioIndex, stationIndex, i );
+                    dismiss();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView)
                 {
 
                 }
@@ -70,6 +83,7 @@ public class SongListFragment extends DialogFragment
     public void onAttach( Activity _activity )
     {
         super.onAttach( _activity );
+        this.context = _activity;
         try
         {
             this.interactionListener = (OnFragmentInteractionListener)_activity;

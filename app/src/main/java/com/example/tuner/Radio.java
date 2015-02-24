@@ -21,12 +21,12 @@ public class Radio
 	public String name = "UNDEFINED";
 	public boolean songOverlay = false;
 	
-	public int currentStationIndex = 0;
+	private int currentStationIndex = 0;
 	
-	public ArrayList<Station> stationList = new ArrayList<Station>();
-	public ArrayList<File> advertList = new ArrayList<File>();
-	public ArrayList<File> weatherList = new ArrayList<File>();
-	public ArrayList<File> newsList = new ArrayList<File>();
+	private ArrayList<Station> stationList = new ArrayList<Station>();
+	private ArrayList<File> advertList = new ArrayList<File>();
+	private ArrayList<File> weatherList = new ArrayList<File>();
+	private ArrayList<File> newsList = new ArrayList<File>();
 	
 	public Radio( File _directory ) throws Exception
 	{
@@ -177,8 +177,6 @@ public class Radio
 		return this.stationList.get( this.currentStationIndex  );
 	}
 
-	
-
 	public boolean canPlaySoundType( SOUND_TYPE _soundType )
 	{
 		Station station = this.getCurrentStation();
@@ -217,7 +215,7 @@ public class Radio
 	
 	public File getNextNews()
 	{
-		File news = this.newsList.get( 0 );
+		File news = this.newsList.get(0);
 		this.newsList.remove( 0 );
 		this.newsList.add( news );
 		return news;
@@ -231,4 +229,27 @@ public class Radio
 		return weather;
 	}
 
+    public boolean hasWeather()
+    {
+        return this.weatherList.size() > 0;
+    }
+
+    public int getStationCount()
+    {
+        return this .stationList.size();
+    }
+
+    public Station getStation( int _stationIndex )
+    {
+        return this.stationList.get( _stationIndex );
+    }
+
+    public boolean isStation( int _stationIndex )
+    {
+        return this.currentStationIndex == _stationIndex;
+    }
+
+    public void setCurrentStation( int _stationIndex ) {
+        this.currentStationIndex = _stationIndex;
+    }
 }

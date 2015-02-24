@@ -3,6 +3,7 @@ package com.example.tuner;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.widget.Toast;
 
 public class TunerAudioControl
 {
@@ -45,9 +46,12 @@ public class TunerAudioControl
 				{
 					TunerAudioControl.instance.playNextItem();
 				}
-				catch (Exception e)
+				catch (Exception _e)
 				{
-					e.printStackTrace();
+                    Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
+                    t.show();
+                    _e.printStackTrace();
+                    throw new RuntimeException( _e );
 				}
 			}
 		};

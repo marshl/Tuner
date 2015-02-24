@@ -40,7 +40,7 @@ public class RadioFragment extends Fragment
         if ( this.getArguments() != null )
         {
             this.radioIndex  = getArguments().getInt( RADIO_ID_PARAM );
-            this.radio = RadioMaster.instance.radioList.get( radioIndex );
+            this.radio = RadioMaster.instance.getRadio( this.radioIndex );
         }
     }
 

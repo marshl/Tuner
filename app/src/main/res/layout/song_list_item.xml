@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="5dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/son_item_song_name_default"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="[SONG_NAME]"
         android:id="@+id/song_item_song_name" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="[SONG_ARTIST]"
+        android:id="@+id/song_item_song_artist"
+        android:textColor="@android:color/darker_gray" />
+
 </LinearLayout>

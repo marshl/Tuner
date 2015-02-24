@@ -9,10 +9,12 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class TunerMain extends Activity implements SongListFragment.OnFragmentInteractionListener
 {
@@ -24,7 +26,9 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 	{
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_tuner_main );
-		
+
+
+        final Activity context = this;
 		if ( RadioMaster.instance == null )
 		{
 			RadioMaster radioMaster = new RadioMaster( this );
@@ -32,9 +36,12 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			{
 				radioMaster.LoadRadioDefinitions();
 			}
-			catch (Exception e)
+			catch (Exception _e)
 			{
-				e.printStackTrace();
+                Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
+                t.show();
+                _e.printStackTrace();
+                throw new RuntimeException( _e );
 			}
 		}
 
@@ -70,13 +77,16 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			}
 	    };
 
-	    for ( Radio radio : RadioMaster.instance.radioList )
+        for ( int i = 0; i < RadioMaster.instance.getRadioCount(); ++i )
 	    {
+            Radio radio = RadioMaster.instance.getRadio( i );
 	    	ActionBar.Tab tab = actionBar.newTab();
 	    	tab.setText( radio.name );
             tab.setTabListener( tabListener );
 	        actionBar.addTab( tab );
 	    }
+
+        actionBar.setSelectedNavigationItem( RadioMaster.instance.getRadioIndex());
 	    
 	    this.viewPager.setOnPageChangeListener
 	    (
@@ -100,9 +110,12 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			{
 				audioControl.playNextItem();
 			}
-			catch (Exception e)
+			catch (Exception _e)
 			{
-				e.printStackTrace();
+                Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
+                t.show();
+                _e.printStackTrace();
+                throw new RuntimeException( _e );
 			}
 	    }
 	    
@@ -142,23 +155,52 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			playPauseButton.setImageResource( R.drawable.ic_media_pause );
 		}
 	}
-	
+
+    // Do not change syntax
 	public void onSkipButtonClick( View _view )
 	{
+        final Activity context = this;
 		try
 		{
 			TunerAudioControl.instance.playNextItem();
 		}
-		catch ( Exception e )
+		catch ( Exception _e )
 		{
-			e.printStackTrace();
+            Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
+            t.show();
+            _e.printStackTrace();
+            throw new RuntimeException( _e );
 		}
 	}
 
     @Override
-    public void onFragmentInteraction( int _songIndex )
-    {
+    public void onFragmentInteraction( int _songIndex ) {
 
+    }
+
+    public void selectSong( int _radioIndex, int _stationIndex, int _songIndex )
+    {
+        if ( _radioIndex != this.viewPager.getCurrentItem() )
+        {
+            this.viewPager.setCurrentItem( _radioIndex, true );
+        }
+
+        final Activity context = this;
+        try
+        {
+            TunerAudioControl.instance.pause();
+            RadioMaster.instance.setCurrentRadio( _radioIndex );
+            RadioMaster.instance.getCurrentRadio().setCurrentStation(_stationIndex);
+            RadioMaster.instance.getCurrentRadio().getCurrentStation().setSongIndex( _songIndex );
+            TunerAudioControl.instance.playNextItem();
+        }
+        catch ( Exception _e )
+        {
+            Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
+            t.show();
+            _e.printStackTrace();
+            throw new RuntimeException( _e );
+        }
     }
 
     public class RadioPagerAdapter extends FragmentPagerAdapter
@@ -177,13 +219,13 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 		@Override
 		public int getCount()
 		{
-			return RadioMaster.instance.radioList.size();
+			return RadioMaster.instance.getRadioCount();
 		}
 
 		@Override
 		public CharSequence getPageTitle( int _position )
 		{
-			return RadioMaster.instance.radioList.get( _position ).name;
+			return RadioMaster.instance.getRadio( _position ).name;
 		}
 	}
 
@@ -192,9 +234,20 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 		SoundFileList fileList = TunerAudioControl.instance.fileList;
 		
 		final TextView songNameView = (TextView)this.findViewById( R.id.song_name_text );
-		songNameView.setText( fileList.song != null ? fileList.song.name : "" );
-		
-		final TextView songArtistView = (TextView)this.findViewById( R.id.song_artist_text );
+
+        String label;
+        if ( fileList.song != null )
+        {
+            label = fileList.song.name;
+        }
+        else
+        {
+            label = soundTypeToLabel( fileList.type );
+        }
+        songNameView.setText( label );
+
+
+        final TextView songArtistView = (TextView)this.findViewById( R.id.song_artist_text );
 		songArtistView.setText( fileList.song != null ? fileList.song.artist : "" );
 		
 		final ImageButton playPauseButton = (ImageButton)this.findViewById( R.id.play_pause_button );
@@ -209,4 +262,31 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			stationList.invalidateViews();
 		}
 	}
+
+    public String soundTypeToLabel( RadioMaster.SOUND_TYPE _soundType) {
+        switch ( _soundType ) {
+            case GENERAL:
+                return "General";
+            case WEATHER:
+                return "Weather";
+            case ID:
+                return "Station ID";
+            case TIME:
+                return "Time";
+            case SONG:
+                return "Song";
+            case ADVERT:
+                return "Advert";
+            case NEWS:
+                return "News";
+            case TO_NEWS:
+                return "News Transition";
+            case TO_WEATHER:
+                return "Weather Transition";
+            case TO_ADVERT:
+                return "Advert Transition";
+            default:
+                throw new IllegalArgumentException( "Uncaught SOUND_TYPE" + _soundType );
+        }
+    }
 }

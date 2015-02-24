@@ -12,4 +12,5 @@ public class SoundFileList
 	public File outroFile;
 	
 	public boolean usesOverlay;
+    public RadioMaster.SOUND_TYPE type;
 }

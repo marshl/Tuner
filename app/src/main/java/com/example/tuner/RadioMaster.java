@@ -16,8 +16,8 @@ import android.util.Log;
 public class RadioMaster
 {
 	static public RadioMaster instance;
-	
-	public enum SOUND_TYPE
+
+    public enum SOUND_TYPE
 	{
 		GENERAL,
 		WEATHER,
@@ -34,8 +34,8 @@ public class RadioMaster
 	private SOUND_TYPE lastPlayedSoundType = SOUND_TYPE.SONG;
 
 	public Activity context;
-	public ArrayList<Radio> radioList = new ArrayList<Radio>();
-	public int currentRadioIndex = 0;
+	private ArrayList<Radio> radioList = new ArrayList<Radio>();
+	private int currentRadioIndex = 0;
 	
 	public RadioMaster( Activity _context )
 	{
@@ -91,8 +91,8 @@ public class RadioMaster
 			}
 		}
 	}
-	
-	public boolean checkFile( File _file )
+
+    public boolean checkFile( File _file )
 	{
 		if ( !_file.exists() )
 		{
@@ -159,7 +159,7 @@ public class RadioMaster
 		}
 		case WEATHER:
 		{
-			if ( this.getCurrentRadio().weatherList.size() > 0 )
+			if ( this.getCurrentRadio().hasWeather() )
 			{
 				fileList.mainFile = this.getCurrentRadio().getNextWeather();
 			}
@@ -190,6 +190,7 @@ public class RadioMaster
 		}
 		
 		this.lastPlayedSoundType = soundType;
+        fileList.type = soundType;
 		return fileList;
 	}
 
@@ -240,4 +241,30 @@ public class RadioMaster
 		// If there are no applicable files, use the last played type
 		return this.lastPlayedSoundType;
 	}
+
+    public int getRadioCount()
+    {
+        return this.radioList.size();
+    }
+
+    public Radio getRadio( int _radioIndex )
+    {
+        return this.radioList.get( _radioIndex );
+    }
+
+    public boolean isRadio( int _radioIndex )
+    {
+        return this.currentRadioIndex == _radioIndex;
+    }
+
+    public void setCurrentRadio( int _radioIndex )
+    {
+        this.currentRadioIndex = _radioIndex;
+    }
+
+    public int getRadioIndex() {
+        return this.currentRadioIndex;
+    }
+
+
 }

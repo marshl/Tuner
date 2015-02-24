@@ -5,14 +5,9 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-/**
- * Created by Liam on 13/02/2015.
- */
 public class SongListAdapter implements ListAdapter
 {
     private Activity context;
@@ -85,6 +80,9 @@ public class SongListAdapter implements ListAdapter
 
         final TextView nameTextView = (TextView)_convertView.findViewById( R.id.song_item_song_name );
         nameTextView.setText( song.name );
+
+        final TextView artistTextView = (TextView)_convertView.findViewById( R.id.song_item_song_artist );
+        artistTextView.setText( song.artist );
 
         return _convertView;
     }

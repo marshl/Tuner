@@ -2,9 +2,7 @@ package com.example.tuner;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.database.DataSetObserver;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class StationListAdapter implements ListAdapter
 {
@@ -43,13 +42,13 @@ public class StationListAdapter implements ListAdapter
 	@Override
 	public int getCount()
 	{
-		return this.fragmentParent.radio.stationList.size();
+		return this.fragmentParent.radio.getStationCount();
 	}
 
 	@Override
 	public Object getItem( int _position )
 	{
-		return this.fragmentParent.radio.stationList.get( _position );
+		return this.fragmentParent.radio.getStation( _position );
 	}
 
 	@Override
@@ -74,9 +73,11 @@ public class StationListAdapter implements ListAdapter
 			_convertView = layoutInflater.inflate( R.layout.station_list_item, _parent, false );
 		}
 
-		final Station station = this.fragmentParent.radio.stationList.get( _position );
-		
-		boolean selected = RadioMaster.instance.getCurrentRadio().getCurrentStation() == station;
+		final Station station = this.fragmentParent.radio.getStation( _position );
+
+        boolean selected =  RadioMaster.instance.isRadio( this.fragmentParent.radioIndex )
+                         && RadioMaster.instance.getCurrentRadio().isStation( _position );
+
 		
 		LinearLayout stationRoot = (LinearLayout)_convertView.findViewById( R.id.station_list_root );
 		stationRoot.setBackgroundColor( selected ? 0xff666666 : 0x00000000 );
@@ -93,7 +94,7 @@ public class StationListAdapter implements ListAdapter
 		final ImageView iconView = (ImageView)_convertView.findViewById( R.id.station_list_station_icon );
 		iconView.setImageBitmap( station.iconData );
 		
-		_convertView.setOnClickListener( new StationListOnClickListener( this.fragmentParent.radioIndex, 
+		_convertView.setOnClickListener( new StationListOnClickListener( this.context, this.fragmentParent.radioIndex,
 				_position, this.fragmentParent.stationList ) );
 
         final int stationIndex = _position;
@@ -128,7 +129,7 @@ public class StationListAdapter implements ListAdapter
 	@Override
 	public boolean isEmpty()
 	{
-		return this.fragmentParent.radio.stationList.isEmpty();
+		return this.fragmentParent.radio.getStationCount() == 0;
 	}
 
 	@Override
@@ -145,11 +146,14 @@ public class StationListAdapter implements ListAdapter
 	
 	public static class StationListOnClickListener implements OnClickListener
 	{
+        private Activity context;
+
 		public int radioIndex;
 		public int stationIndex;
 
-		public StationListOnClickListener( int _radioIndex, int _stationIndex, ListView _listView  )
+		public StationListOnClickListener( Activity _context, int _radioIndex, int _stationIndex, ListView _listView  )
 		{
+            this.context = _context;
 			this.radioIndex = _radioIndex;
 			this.stationIndex = _stationIndex;
 		}
@@ -158,20 +162,23 @@ public class StationListAdapter implements ListAdapter
 		public void onClick( View v )
 		{
 			// Do not make any changes if the current playing station was selected
-			if ( RadioMaster.instance.currentRadioIndex != this.radioIndex
-			  || RadioMaster.instance.getCurrentRadio().currentStationIndex != this.stationIndex )
+			if ( !RadioMaster.instance.isRadio( this.radioIndex )
+			  || !RadioMaster.instance.getCurrentRadio().isStation( this.stationIndex ) )
 			{
-				RadioMaster.instance.currentRadioIndex = this.radioIndex;
-				RadioMaster.instance.getCurrentRadio().currentStationIndex = this.stationIndex;
+				RadioMaster.instance.setCurrentRadio( this.radioIndex );
+				RadioMaster.instance.getCurrentRadio().setCurrentStation( this.stationIndex );
 				
 				try
 				{
 					TunerAudioControl.instance.isResetting = true;
 					TunerAudioControl.instance.playNextItem();
 				}
-				catch ( Exception e )
+				catch ( Exception _e )
 				{
-					e.printStackTrace();
+                    Toast t = Toast.makeText( this.context, _e.toString(), Toast.LENGTH_SHORT );
+                    t.show();
+					_e.printStackTrace();
+                    throw new RuntimeException( _e );
 				}
 			}
 		}

@@ -14,6 +14,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.util.Xml;
 
 import com.example.tuner.RadioMaster.SOUND_TYPE;
@@ -30,7 +31,7 @@ public class Station
 	public boolean fullTrack = false;
 	
 	private ArrayList<Song> songList = new ArrayList<Song>();
-    private int songIndex;
+    private int songIndex = 0;
 	public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
 	
 	public Station( Radio _parentRadio, String _dir ) throws Exception
@@ -53,7 +54,7 @@ public class Station
 		
 		this.loadXml();
         Random rand = new Random();
-        this.songIndex = rand.nextInt() % this.songList.size();
+        this.songIndex = rand.nextInt( this.songList.size() ) ;
 
 		for ( Entry<SOUND_TYPE, ArrayList<File>> entry : this.miscFileMap.entrySet() )
 		{
@@ -235,7 +236,7 @@ public class Station
 	public Song getNextSong()
 	{
         Song song = this.getSongAtIndex( this.songIndex );
-        this.songIndex = (this.songIndex == this.songList.size() ) ? 0 : this.songIndex + 1;
+        this.songIndex = (this.songIndex + 1 >= this.songList.size() ) ? 0 : this.songIndex + 1;
         return song;
 	}
 	
@@ -266,6 +267,12 @@ public class Station
 
     public Song getSongAtIndex( int _position )
     {
+        Log.d("TNR", this.songList.size() + ":" + _position );
         return this.songList.get( _position );
+    }
+
+    public void setSongIndex( int _songIndex )
+    {
+        this.songIndex = _songIndex;
     }
 }
