@@ -3,6 +3,7 @@ package com.example.tuner;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,26 +57,8 @@ public class SongListFragment extends DialogFragment
         View rootView = _inflater.inflate( R.layout.fragment_song_list, _container, false );
 
         ListView listView = (ListView)rootView.findViewById( R.id.song_list_view );
-        listView.setAdapter(new SongListAdapter( this.station ));
+        listView.setAdapter( new SongListAdapter( this, this.station ) );
 
-        listView.setOnItemSelectedListener
-        (
-            new AdapterView.OnItemSelectedListener()
-            {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    TunerMain main = (TunerMain)context;
-                    main.selectSong( radioIndex, stationIndex, i );
-                    dismiss();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView)
-                {
-
-                }
-            }
-        );
         return rootView;
     }
 

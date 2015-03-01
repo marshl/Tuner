@@ -71,29 +71,34 @@ public class TunerAudioControl
 			}
 		};
 	}
-	
-	public void playNextItem() throws Exception
-	{
-		// Unpause and release
-		this.isPlaying = true;
-		this.mainPlayer.release();
-		if ( this.introPlayer != null )
-		{
-			this.introPlayer.release();
-		}
-		if ( this.outroPlayer != null )
-		{
-			this.outroPlayer.release();
-		}
-		
-		// Play next item
-		SoundFileList fileList = RadioMaster.instance.getNextFileBlock( this.isResetting );
-		this.playFileList( fileList );
-		
-		// Notify UI
-		this.context.onSoundItemChange();
-	}
-	
+
+    public void playNextItem() throws Exception
+    {
+        this.playSound( RadioMaster.instance.getRandomSoundType( this.isResetting ) );
+    }
+
+    public void playSound( RadioMaster.SOUND_TYPE _soundType ) throws Exception
+    {
+        // Unpause and release
+        this.isPlaying = true;
+        this.mainPlayer.release();
+        if ( this.introPlayer != null )
+        {
+            this.introPlayer.release();
+        }
+        if ( this.outroPlayer != null )
+        {
+            this.outroPlayer.release();
+        }
+
+        // Play next item
+        SoundFileList fileList = RadioMaster.instance.getNextFileBlock( _soundType, this.isResetting );
+        this.playFileList( fileList );
+
+        // Notify UI
+        this.context.onSoundItemChange();
+    }
+
 	public void playFileList( SoundFileList _fileList ) throws Exception
 	{
 		this.fileList = _fileList;

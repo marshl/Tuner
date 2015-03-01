@@ -21,7 +21,9 @@ import com.example.tuner.RadioMaster.SOUND_TYPE;
 
 public class Station
 {
-	private Radio  parentRadio;
+    public int stationIndex;
+
+    private Radio  parentRadio;
 	private File   directory;
 	public String name;
 	public String dj;
@@ -33,9 +35,10 @@ public class Station
 	private ArrayList<Song> songList = new ArrayList<Song>();
     private int songIndex = 0;
 	public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
-	
-	public Station( Radio _parentRadio, String _dir ) throws Exception
+
+    public Station( Radio _parentRadio, int _stationIndex, String _dir ) throws Exception
 	{
+        this.stationIndex = _stationIndex;
 		this.parentRadio = _parentRadio;
 		this.directory = new File( this.parentRadio.directory.toString() + "/" + _dir );
 		if ( !this.directory.exists() )
@@ -93,9 +96,7 @@ public class Station
 		if ( iconName != null )
 		{
 			this.iconFile = new File( this.directory + "/" + iconName );
-			
 			File pngFile = new File( this.iconFile.toString().replaceFirst( ".bmp", ".png" ) );
-			//Log.w( "TNR", pngFile.toString() );
 			if ( pngFile.isFile() )
 			{
 				this.iconData = BitmapFactory.decodeFile( pngFile.toString() );
@@ -128,8 +129,7 @@ public class Station
 			{
 				String filename = _parser.getAttributeValue( null, "file" );
 				File file = new File( this.directory.toString() + "/" + filename );
-				//Log.d( "TNR", file.toString() );
-				
+
 				if ( !RadioMaster.instance.checkFile( file ) )
 				{
 					RadioMaster.skip( _parser );
@@ -185,9 +185,7 @@ public class Station
 		
 		song.name = _parser.getAttributeValue( null, "name" );
 		song.artist = _parser.getAttributeValue( null, "artist" );
-		
-		//Log.d( "TNR", "SongName: " + song.name );
-		
+
 		while ( _parser.next() != XmlPullParser.END_TAG )
 		{
 			if ( _parser.getEventType() != XmlPullParser.START_TAG )
@@ -204,7 +202,6 @@ public class Station
 				String dir = _parser.getAttributeValue( null, "file" );
 				
 				File file = new File( this.directory.toString() + "/" + dir );
-				//Log.d( "TNR", "Song Element " + name + " found: " + dir );
 				if ( !RadioMaster.instance.checkFile( file ) )
 				{
 					RadioMaster.skip( _parser );
@@ -267,12 +264,16 @@ public class Station
 
     public Song getSongAtIndex( int _position )
     {
-        Log.d("TNR", this.songList.size() + ":" + _position );
         return this.songList.get( _position );
     }
 
     public void setSongIndex( int _songIndex )
     {
         this.songIndex = _songIndex;
+    }
+
+    public Radio getParentRadio()
+    {
+        return this.parentRadio;
     }
 }

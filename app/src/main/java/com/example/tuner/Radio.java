@@ -17,6 +17,8 @@ import com.example.tuner.RadioMaster.SOUND_TYPE;
 
 public class Radio
 {
+    public int radioIndex;
+
 	public File directory;
 	public String name = "UNDEFINED";
 	public boolean songOverlay = false;
@@ -28,8 +30,9 @@ public class Radio
 	private ArrayList<File> weatherList = new ArrayList<File>();
 	private ArrayList<File> newsList = new ArrayList<File>();
 	
-	public Radio( File _directory ) throws Exception
+	public Radio( int _index, File _directory ) throws Exception
 	{
+        this.radioIndex = _index;
 		this.directory = _directory;
 		
 		this.loadXml();
@@ -97,7 +100,7 @@ public class Radio
 				String dir = _parser.getAttributeValue( null, "dir" );
 				try
 				{
-					Station station = new Station( this, dir );
+					Station station = new Station( this, this.stationList.size(), dir );
 					this.stationList.add( station );
 				}
 				catch ( Exception _e )
@@ -156,13 +159,10 @@ public class Radio
 
 			String name = _parser.getName();
 			if ( name.equals( _elementName ) )
-			//if ( name.equals( "advert" ) )
 			{
 				String filename = _parser.getAttributeValue( null, "file" );
 				File file = new File( _rootPath + "/" + filename );
-				//this.advertList.add( file );
 				_list.add( file );
-				//Log.d( "TNR", filename );
 				RadioMaster.skip( _parser );
 			}
 			else

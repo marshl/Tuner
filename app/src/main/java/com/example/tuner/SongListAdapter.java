@@ -2,6 +2,7 @@ package com.example.tuner;
 
 import android.app.Activity;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +11,13 @@ import android.widget.TextView;
 
 public class SongListAdapter implements ListAdapter
 {
+    private SongListFragment fragmentParent;
     private Activity context;
     private Station station;
 
-    public SongListAdapter( Station _station )
+    public SongListAdapter( SongListFragment _fragmentParent, Station _station )
     {
+        this.fragmentParent = _fragmentParent;
         this.context = RadioMaster.instance.context;
         this.station = _station;
     }
@@ -83,6 +86,18 @@ public class SongListAdapter implements ListAdapter
 
         final TextView artistTextView = (TextView)_convertView.findViewById( R.id.song_item_song_artist );
         artistTextView.setText( song.artist );
+
+        final int songIndex = _position;
+        _convertView.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                TunerMain main = (TunerMain)context;
+                main.selectSong( station.getParentRadio().radioIndex, station.stationIndex, songIndex );
+                fragmentParent.dismiss();
+            }
+        });
 
         return _convertView;
     }

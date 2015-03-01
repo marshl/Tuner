@@ -180,6 +180,8 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
     public void selectSong( int _radioIndex, int _stationIndex, int _songIndex )
     {
+        Log.d( "TNR", "Selecting Song on radio:" + _radioIndex + " station:" + _stationIndex + " song:" + _songIndex );
+
         if ( _radioIndex != this.viewPager.getCurrentItem() )
         {
             this.viewPager.setCurrentItem( _radioIndex, true );
@@ -190,9 +192,9 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
         {
             TunerAudioControl.instance.pause();
             RadioMaster.instance.setCurrentRadio( _radioIndex );
-            RadioMaster.instance.getCurrentRadio().setCurrentStation(_stationIndex);
+            RadioMaster.instance.getCurrentRadio().setCurrentStation( _stationIndex );
             RadioMaster.instance.getCurrentRadio().getCurrentStation().setSongIndex( _songIndex );
-            TunerAudioControl.instance.playNextItem();
+            TunerAudioControl.instance.playSound( RadioMaster.SOUND_TYPE.SONG );
         }
         catch ( Exception _e )
         {

@@ -59,7 +59,7 @@ public class RadioMaster
 			File radioDir = new File( musicFolder.toString() + "/" + str );
 			if ( radioDir.exists() )
 			{
-				Radio radio = new Radio( radioDir );
+				Radio radio = new Radio( this.radioList.size(), radioDir );
 				this.radioList.add( radio );
 			}
 			else
@@ -107,10 +107,8 @@ public class RadioMaster
 		return this.radioList.get( this.currentRadioIndex  );
 	}
 	
-	public SoundFileList getNextFileBlock( boolean _reset ) throws Exception
+	public SoundFileList getNextFileBlock( SOUND_TYPE _soundType, boolean _reset ) throws Exception
 	{
-		SOUND_TYPE soundType = this.getRandomSoundType( _reset );
-
 		SoundFileList fileList = new SoundFileList();
 		
 		final Radio currentRadio = this.getCurrentRadio();
@@ -121,7 +119,7 @@ public class RadioMaster
 		boolean playSongIntro = tempRand.nextFloat() > 0.5f;
 		boolean playSongOutro = tempRand.nextFloat() > 0.5f;
 		
-		switch ( soundType )
+		switch ( _soundType )
 		{
 		case SONG:
 		{
@@ -154,7 +152,7 @@ public class RadioMaster
 		case ID:
 		case TIME:
 		{
-			fileList.mainFile = this.getCurrentRadio().getCurrentStation().getNextMiscFile( soundType );
+			fileList.mainFile = this.getCurrentRadio().getCurrentStation().getNextMiscFile( _soundType );
 			break;
 		}
 		case WEATHER:
@@ -165,7 +163,7 @@ public class RadioMaster
 			}
 			else
 			{
-				fileList.mainFile =  this.getCurrentRadio().getCurrentStation().getNextMiscFile( soundType );
+				fileList.mainFile =  this.getCurrentRadio().getCurrentStation().getNextMiscFile( _soundType );
 			}
 			
 			if ( playMiscIntro )
@@ -185,16 +183,16 @@ public class RadioMaster
 		}
 		default:
 		{
-			throw new Exception( "Uncaught SOUND_TYPE " + soundType );
+			throw new Exception( "Uncaught SOUND_TYPE " + _soundType );
 		}
 		}
 		
-		this.lastPlayedSoundType = soundType;
-        fileList.type = soundType;
+		this.lastPlayedSoundType = _soundType;
+        fileList.type = _soundType;
 		return fileList;
 	}
 
-	private SOUND_TYPE getRandomSoundType( boolean _reset )
+	public SOUND_TYPE getRandomSoundType( boolean _reset )
 	{
 		if ( _reset )
 		{// On a reset, play a station ID/general first (if applicable)
@@ -207,7 +205,9 @@ public class RadioMaster
 				return SOUND_TYPE.GENERAL;
 			}
 		}
-		
+
+
+        // Build a list of weights, with a more songs than the rest to give it a higher chance
 		ArrayList<SOUND_TYPE> typeWeights = new ArrayList<SOUND_TYPE>();
 		for ( int i = 0; i < 8; ++i )
 		{
