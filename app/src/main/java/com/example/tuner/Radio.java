@@ -105,6 +105,7 @@ public class Radio
 				}
 				catch ( Exception _e )
 				{
+                    CustomLog.appendException( _e );
 					Log.w( "TNR", _e.toString() );
 				}
 				RadioMaster.skip( _parser );

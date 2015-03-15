@@ -175,8 +175,7 @@ public class StationListAdapter implements ListAdapter
 				}
 				catch ( Exception _e )
 				{
-                    Toast t = Toast.makeText( this.context, _e.toString(), Toast.LENGTH_SHORT );
-                    t.show();
+                    CustomLog.appendException( _e );
 					_e.printStackTrace();
                     throw new RuntimeException( _e );
 				}

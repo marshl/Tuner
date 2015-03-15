@@ -16,6 +16,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.Time;
+
 public class TunerMain extends Activity implements SongListFragment.OnFragmentInteractionListener
 {
 	private RadioPagerAdapter radioPagerAdapter;
@@ -27,6 +29,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_tuner_main );
 
+        CustomLog.appendString( "Startup" );
 
         final Activity context = this;
 		if ( RadioMaster.instance == null )
@@ -38,8 +41,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			}
 			catch (Exception _e)
 			{
-                Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
-                t.show();
+                CustomLog.appendException( _e );
                 _e.printStackTrace();
                 throw new RuntimeException( _e );
 			}
@@ -112,8 +114,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 			}
 			catch (Exception _e)
 			{
-                Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
-                t.show();
+                CustomLog.appendException( _e );
                 _e.printStackTrace();
                 throw new RuntimeException( _e );
 			}
@@ -166,8 +167,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 		}
 		catch ( Exception _e )
 		{
-            Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
-            t.show();
+            CustomLog.appendException( _e );
             _e.printStackTrace();
             throw new RuntimeException( _e );
 		}
@@ -198,8 +198,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
         }
         catch ( Exception _e )
         {
-            Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
-            t.show();
+            CustomLog.appendException( _e );
             _e.printStackTrace();
             throw new RuntimeException( _e );
         }

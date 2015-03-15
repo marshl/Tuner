@@ -48,8 +48,7 @@ public class TunerAudioControl
 				}
 				catch (Exception _e)
 				{
-                    Toast t = Toast.makeText( context, _e.toString(), Toast.LENGTH_SHORT );
-                    t.show();
+                    CustomLog.appendException( _e );
                     _e.printStackTrace();
                     throw new RuntimeException( _e );
 				}
@@ -90,6 +89,7 @@ public class TunerAudioControl
         {
             this.outroPlayer.release();
         }
+        this.introPlayer = this.outroPlayer = null;
 
         // Play next item
         SoundFileList fileList = RadioMaster.instance.getNextFileBlock( _soundType, this.isResetting );
@@ -111,7 +111,7 @@ public class TunerAudioControl
 		{
 			this.introPlayer = new MediaPlayer();
 			this.introPlayer.setDataSource( _fileList.introFile.toString() );
-			this.introPlayer.prepareAsync();
+			this.introPlayer.prepare();
 			
 			// The intro is the start of the song (in both sequence and overlay mode)
 			this.introPlayer.setOnPreparedListener( this.onPreparationCompleteListener );
@@ -130,7 +130,7 @@ public class TunerAudioControl
 		{
 			this.outroPlayer = new MediaPlayer();
 			this.outroPlayer.setDataSource( _fileList.outroFile.toString() );
-			this.outroPlayer.prepareAsync();
+			this.outroPlayer.prepare();
 			
 			// The song ends after the outro if in sequence mode
 			if ( !_fileList.usesOverlay )
