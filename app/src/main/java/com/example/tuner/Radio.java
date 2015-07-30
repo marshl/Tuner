@@ -1,6 +1,7 @@
 package com.example.tuner;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,8 +68,8 @@ public class Radio
 
 		this.name = _parser.getAttributeValue( null, "name" );
 		String overlayStr = _parser.getAttributeValue( null, "songoverlay" );
-		this.songOverlay = overlayStr.equals( "true" );
-		
+		this.songOverlay = overlayStr != null && overlayStr.equals( "true" );
+
 		while ( _parser.next() != XmlPullParser.END_TAG )
 		{
 			if ( _parser.getEventType() != XmlPullParser.START_TAG )
@@ -120,13 +121,10 @@ public class Radio
 			}
 		}
 	}
-	
-	//private void readAdverts( String _path ) throws IOException, XmlPullParserException
+
 	private void readOtherSoundGroup( List<File> _fileList, String _folderName, String _filename, String _rootName, String _elementName ) throws IOException, XmlPullParserException
 	{
-		//this.advertPath = new File( this.directory.toString() + "/" + _path );
 		String rootPath = this.directory.toString() + "/" + _folderName;
-		//File dataFile = new File( this.advertPath.toString() + "/adverts.xml" );
 		File dataFile = new File( rootPath + "/" + _filename );
 		if ( !dataFile.exists() )
 		{
@@ -139,17 +137,14 @@ public class Radio
 		parser.setFeature( XmlPullParser.FEATURE_PROCESS_NAMESPACES, false );
 		parser.setInput( fileStream, null );
 		parser.nextTag();
-		//this.readAdvertList( parser );
 		this.readOtherSoundList( _fileList, parser, rootPath, _rootName, _elementName );
 		
 		fileStream.close();
 	}
 
 	private void readOtherSoundList( List<File> _list, XmlPullParser _parser, String _rootPath, String _rootName, String _elementName ) throws XmlPullParserException, IOException
-	//private void readAdvertList( XmlPullParser _parser ) throws XmlPullParserException, IOException
 	{
 		_parser.require( XmlPullParser.START_TAG, null, _rootName );
-		//_parser.require( XmlPullParser.START_TAG, null, "adverts" );
 
 		while ( _parser.next() != XmlPullParser.END_TAG )
 		{

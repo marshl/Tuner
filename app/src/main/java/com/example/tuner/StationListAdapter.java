@@ -146,16 +146,18 @@ public class StationListAdapter implements ListAdapter
 	
 	public static class StationListOnClickListener implements OnClickListener
 	{
-        private Activity context;
+        //private Activity context;
 
 		public int radioIndex;
 		public int stationIndex;
+        public ListView listView;
 
 		public StationListOnClickListener( Activity _context, int _radioIndex, int _stationIndex, ListView _listView  )
 		{
-            this.context = _context;
+            //this.context = _context;
 			this.radioIndex = _radioIndex;
 			this.stationIndex = _stationIndex;
+            this.listView = _listView;
 		}
 		
 		@Override
@@ -180,6 +182,8 @@ public class StationListAdapter implements ListAdapter
                     throw new RuntimeException( _e );
 				}
 			}
+
+            this.listView.invalidate();
 		}
 	}
 

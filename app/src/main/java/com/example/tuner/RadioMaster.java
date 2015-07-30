@@ -123,7 +123,11 @@ public class RadioMaster
 		{
 		case SONG:
 		{
-			fileList = currentStation.getNextSong().getFileList();
+            Song s = currentStation.getNextSong();
+            if ( s == null )
+                return null;
+
+			fileList = s.getFileList();
 			fileList.usesOverlay = this.getCurrentRadio().songOverlay;
 			
 			if ( fileList.usesOverlay )

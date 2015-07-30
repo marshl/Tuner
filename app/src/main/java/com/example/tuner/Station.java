@@ -31,6 +31,7 @@ public class Station
 	private File   iconFile;
 	public Bitmap iconData;
 	public boolean fullTrack = false;
+    public boolean loadAll = false;
 	
 	private ArrayList<Song> songList = new ArrayList<Song>();
     private int songIndex = 0;
@@ -57,7 +58,6 @@ public class Station
 		
 		this.loadXml();
         Random rand = new Random();
-        this.songIndex = rand.nextInt( this.songList.size() ) ;
 
 		for ( Entry<SOUND_TYPE, ArrayList<File>> entry : this.miscFileMap.entrySet() )
 		{
@@ -91,7 +91,15 @@ public class Station
 		this.name = _parser.getAttributeValue( null, "name" );
 		this.dj = _parser.getAttributeValue( null, "dj" );
 		this.genre = _parser.getAttributeValue( null, "genre" );
-		
+
+        String loadAllStr = _parser.getAttributeValue( null, "loadall");
+        this.loadAll = loadAllStr != null && loadAllStr.equals( "true" );
+
+        if ( this.loadAll )
+        {
+            this.loadAllMusicFiles();
+        }
+
 		String iconName = _parser.getAttributeValue( null, "icon" );
 		if ( iconName != null )
 		{
@@ -176,6 +184,34 @@ public class Station
 			}
 		}
 	}
+
+    private void loadAllMusicFiles()
+    {
+        Log.d( this.name, "loading all music files" );
+        this.loadMusicFilesFromDir( this.directory );
+    }
+
+    private void loadMusicFilesFromDir( File _dir )
+    {
+        for ( File file : _dir.listFiles() )
+        {
+            if ( file.isDirectory() )
+            {
+                this.loadMusicFilesFromDir( file );
+                continue;
+            }
+
+            if ( !file.getName().endsWith( ".mp3" ) )
+                continue;
+
+            Song song = new Song();
+            // Remove file extension
+            song.name = file.getName().replaceFirst("[.][^.]+$", "");
+            song.artist = this.dj;
+            song.main = file;
+            this.songList.add( song );
+        }
+    }
 	
 	private void readSong( XmlPullParser _parser ) throws XmlPullParserException, IOException
 	{
@@ -264,7 +300,7 @@ public class Station
 
     public Song getSongAtIndex( int _position )
     {
-        return this.songList.get( _position );
+        return _position < this.songList.size() ? this.songList.get( _position ) : null;
     }
 
     public void setSongIndex( int _songIndex )

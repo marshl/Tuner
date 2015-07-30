@@ -8,6 +8,11 @@
         <item>GTA_VC</item>
         <item>San Andreas</item>
         <item>GTA_IV</item>
+        <item>Fallout_3</item>
+        <item>Morrowind</item>
+        <item>Oblivion</item>
+        <item>Skyrim</item>
+        <item>Red Alert</item>
     </string-array>
 
     <string name="title_activity_tuner_main">Tuner</string>

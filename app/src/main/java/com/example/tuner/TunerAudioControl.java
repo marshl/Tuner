@@ -3,7 +3,6 @@ package com.example.tuner;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.widget.Toast;
 
 public class TunerAudioControl
 {
@@ -93,10 +92,12 @@ public class TunerAudioControl
 
         // Play next item
         SoundFileList fileList = RadioMaster.instance.getNextFileBlock( _soundType, this.isResetting );
-        this.playFileList( fileList );
-
-        // Notify UI
-        this.context.onSoundItemChange();
+        if ( fileList != null )
+        {
+            this.playFileList(fileList);
+            // Notify UI
+            this.context.onSoundItemChange();
+        }
     }
 
 	public void playFileList( SoundFileList _fileList ) throws Exception
