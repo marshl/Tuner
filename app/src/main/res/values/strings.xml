@@ -12,7 +12,7 @@
         <item>Morrowind</item>
         <item>Oblivion</item>
         <item>Skyrim</item>
-        <item>Red Alert</item>
+        <item>Other</item>
     </string-array>
 
     <string name="title_activity_tuner_main">Tuner</string>
