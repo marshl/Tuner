@@ -1,7 +1,9 @@
 package com.example.tuner;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +39,7 @@ public class Station
     private int songIndex = 0;
 	public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
 
-    public Station( Radio _parentRadio, int _stationIndex, String _dir ) throws Exception
+    public Station( Radio _parentRadio, int _stationIndex, String _dir ) throws IOException, XmlPullParserException
 	{
         this.stationIndex = _stationIndex;
 		this.parentRadio = _parentRadio;
@@ -65,7 +67,7 @@ public class Station
 		}
 	}
 	
-	private void loadXml() throws Exception
+	private void loadXml() throws IOException, XmlPullParserException
 	{
 		File dataFile = new File( this.directory.toString() + "/station.xml" );
 		if ( !dataFile.exists() )
@@ -84,7 +86,7 @@ public class Station
 		fileStream.close();
 	}
 	
-	private void readStationData( XmlPullParser _parser ) throws Exception
+	private void readStationData( XmlPullParser _parser ) throws IOException, XmlPullParserException
 	{
 		_parser.require( XmlPullParser.START_TAG, null, "station" );
 
@@ -193,16 +195,18 @@ public class Station
 
     private void loadMusicFilesFromDir( File _dir )
     {
-        for ( File file : _dir.listFiles() )
+        for ( File file : _dir.listFiles( new FilenameFilter() {
+            @Override
+            public boolean accept( File file, String s ) {
+                return s.endsWith( ".mp3" ) || s.endsWith( ".ogg" );
+            }
+        }) )
         {
             if ( file.isDirectory() )
             {
                 this.loadMusicFilesFromDir( file );
                 continue;
             }
-
-            if ( !file.getName().endsWith( ".mp3" ) )
-                continue;
 
             Song song = new Song();
             // Remove file extension

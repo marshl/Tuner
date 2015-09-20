@@ -43,13 +43,13 @@ public class RadioMaster
 		this.context = _context;
 	}
 	
-	public void LoadRadioDefinitions() throws Exception
+	public void LoadRadioDefinitions() throws IOException, XmlPullParserException
 	{
 		File rootFile = Environment.getExternalStorageDirectory();
 		File musicFolder = new File( rootFile.toString() + "/Music" );
 		if ( !musicFolder.exists() )
 		{
-			throw new Exception( "Cannot find music directory" );
+			throw new IOException( "Cannot find music directory" );
 		}
 		
 		String[] radioNames = this.context.getResources().getStringArray( R.array.radio_array );
@@ -107,7 +107,7 @@ public class RadioMaster
 		return this.radioList.get( this.currentRadioIndex  );
 	}
 	
-	public SoundFileList getNextFileBlock( SOUND_TYPE _soundType, boolean _reset ) throws Exception
+	public SoundFileList getNextFileBlock( SOUND_TYPE _soundType ) throws IllegalArgumentException
 	{
 		SoundFileList fileList = new SoundFileList();
 		
@@ -187,7 +187,7 @@ public class RadioMaster
 		}
 		default:
 		{
-			throw new Exception( "Uncaught SOUND_TYPE " + _soundType );
+			throw new IllegalArgumentException( "Uncaught SOUND_TYPE " + _soundType );
 		}
 		}
 		

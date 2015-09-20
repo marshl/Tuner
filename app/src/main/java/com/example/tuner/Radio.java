@@ -31,7 +31,7 @@ public class Radio
 	private ArrayList<File> weatherList = new ArrayList<File>();
 	private ArrayList<File> newsList = new ArrayList<File>();
 	
-	public Radio( int _index, File _directory ) throws Exception
+	public Radio( int _index, File _directory ) throws IOException, XmlPullParserException
 	{
         this.radioIndex = _index;
 		this.directory = _directory;
@@ -43,7 +43,7 @@ public class Radio
         Collections.shuffle( this.weatherList );
 	}
 	
-	private void loadXml() throws Exception
+	private void loadXml() throws IOException, XmlPullParserException
 	{
 		File dataFile = new File( this.directory.toString() + "/stations.xml" );
 		if ( !dataFile.exists() )
@@ -62,7 +62,7 @@ public class Radio
 		fileStream.close();
 	}
 	
-	private void readStationList( XmlPullParser _parser ) throws Exception
+	private void readStationList( XmlPullParser _parser ) throws IOException, XmlPullParserException
 	{
 		_parser.require( XmlPullParser.START_TAG, null, "stations" );
 

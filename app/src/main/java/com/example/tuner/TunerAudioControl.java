@@ -4,6 +4,8 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 
+import java.io.IOException;
+
 public class TunerAudioControl
 {
 	public static TunerAudioControl instance;
@@ -70,12 +72,12 @@ public class TunerAudioControl
 		};
 	}
 
-    public void playNextItem() throws Exception
+    public void playNextItem() throws IOException
     {
         this.playSound( RadioMaster.instance.getRandomSoundType( this.isResetting ) );
     }
 
-    public void playSound( RadioMaster.SOUND_TYPE _soundType ) throws Exception
+    public void playSound( RadioMaster.SOUND_TYPE _soundType ) throws IOException
     {
         // Unpause and release
         this.isPlaying = true;
@@ -91,16 +93,16 @@ public class TunerAudioControl
         this.introPlayer = this.outroPlayer = null;
 
         // Play next item
-        SoundFileList fileList = RadioMaster.instance.getNextFileBlock( _soundType, this.isResetting );
+        SoundFileList fileList = RadioMaster.instance.getNextFileBlock( _soundType );
         if ( fileList != null )
         {
-            this.playFileList(fileList);
+            this.playFileList( fileList );
             // Notify UI
             this.context.onSoundItemChange();
         }
     }
 
-	public void playFileList( SoundFileList _fileList ) throws Exception
+	public void playFileList( SoundFileList _fileList ) throws IOException
 	{
 		this.fileList = _fileList;
 		
@@ -119,7 +121,7 @@ public class TunerAudioControl
 		}
 		
 		this.mainPlayer.setDataSource( _fileList.mainFile.toString() );
-		this.mainPlayer.prepareAsync();
+		this.mainPlayer.prepare();
 		
 		// The main is the start of the song if in overlay mode or there is no intro
 		if ( _fileList.introFile == null || _fileList.usesOverlay )
