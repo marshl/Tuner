@@ -34,7 +34,7 @@ public class Station
 	public Bitmap iconData;
 	public boolean fullTrack = false;
     public boolean loadAll = false;
-	
+
 	private ArrayList<Song> songList = new ArrayList<Song>();
     private int songIndex = 0;
 	public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
@@ -48,25 +48,24 @@ public class Station
 		{
 			throw new IOException( "Station directory \"" + this.directory.toString() + "\" not found" );
 		}
-		
+
 		this.miscFileMap.put( SOUND_TYPE.GENERAL, new ArrayList<File>() );
 		this.miscFileMap.put( SOUND_TYPE.ID,      new ArrayList<File>() );
 		this.miscFileMap.put( SOUND_TYPE.TIME,    new ArrayList<File>() );
 		this.miscFileMap.put( SOUND_TYPE.WEATHER, new ArrayList<File>() );
-		
+
 		this.miscFileMap.put( SOUND_TYPE.TO_ADVERT, new ArrayList<File>() );
 		this.miscFileMap.put( SOUND_TYPE.TO_WEATHER, new ArrayList<File>() );
 		this.miscFileMap.put( SOUND_TYPE.TO_NEWS, new ArrayList<File>() );
-		
+
 		this.loadXml();
-        Random rand = new Random();
 
 		for ( Entry<SOUND_TYPE, ArrayList<File>> entry : this.miscFileMap.entrySet() )
 		{
 			Collections.shuffle( entry.getValue() );
 		}
 	}
-	
+
 	private void loadXml() throws IOException, XmlPullParserException
 	{
 		File dataFile = new File( this.directory.toString() + "/station.xml" );
@@ -74,18 +73,18 @@ public class Station
 		{
 			throw new IOException( "Could not find " + dataFile.toString() );
 		}
-		
+
 		FileInputStream fileStream = new FileInputStream( dataFile );
-	
+
 		XmlPullParser parser = Xml.newPullParser();
 		parser.setFeature( XmlPullParser.FEATURE_PROCESS_NAMESPACES, false );
 		parser.setInput( fileStream, null );
 		parser.nextTag();
 		this.readStationData( parser );
-		
+
 		fileStream.close();
 	}
-	
+
 	private void readStationData( XmlPullParser _parser ) throws IOException, XmlPullParserException
 	{
 		_parser.require( XmlPullParser.START_TAG, null, "station" );
@@ -116,10 +115,10 @@ public class Station
 				this.iconData = BitmapFactory.decodeFile( iconFile.toString() );
 			}
 		}
-		
+
 		String fullTrackStr = _parser.getAttributeValue( null, "fulltrack" );
 		this.fullTrack = fullTrackStr != null && fullTrackStr.equals( "true" );
-		
+
 		while ( _parser.next() != XmlPullParser.END_TAG )
 		{
 			if ( _parser.getEventType() != XmlPullParser.START_TAG )
@@ -128,11 +127,11 @@ public class Station
 			}
 
 			String name = _parser.getName();
-			
+
 			if ( name.equals( "general" )
 			  || name.equals( "weather" )
 			  || name.equals( "id" )
-		      || name.equals( "time" ) 
+		      || name.equals( "time" )
 		      || name.equals( "to_ad" )
 		      || name.equals( "to_news" )
 		      || name.equals( "to_weather" ) )
@@ -145,7 +144,7 @@ public class Station
 					RadioMaster.skip( _parser );
 					continue;
 				}
-				
+
 				if ( name.equals( "general" ) )
 				{
 					this.miscFileMap.get( SOUND_TYPE.GENERAL ).add( file );
@@ -216,13 +215,13 @@ public class Station
             this.songList.add( song );
         }
     }
-	
+
 	private void readSong( XmlPullParser _parser ) throws XmlPullParserException, IOException
 	{
 		_parser.require( XmlPullParser.START_TAG, null, "song" );
 
 		Song song = new Song();
-		
+
 		song.name = _parser.getAttributeValue( null, "name" );
 		song.artist = _parser.getAttributeValue( null, "artist" );
 
@@ -234,20 +233,20 @@ public class Station
 			}
 
 			String name = _parser.getName();
-			
+
 			if ( name.equals( "in" )
-			  || name.equals( "out" ) 
+			  || name.equals( "out" )
 			  || name.equals( "main" ) )
 			{
 				String dir = _parser.getAttributeValue( null, "file" );
-				
+
 				File file = new File( this.directory.toString() + "/" + dir );
 				if ( !RadioMaster.instance.checkFile( file ) )
 				{
 					RadioMaster.skip( _parser );
 					continue;
 				}
-				
+
 				if ( name.equals( "in" ) )
 				{
 					song.introList.add( file );
@@ -269,23 +268,24 @@ public class Station
 		}
 		this.songList.add( song );
 	}
-	
+
 	public Song getNextSong()
 	{
-        Song song = this.getSongAtIndex( this.songIndex );
-        this.songIndex = (this.songIndex + 1 >= this.songList.size() ) ? 0 : this.songIndex + 1;
+        Random rand = new Random();
+        Song song = this.getSongAtIndex( rand.nextInt( this.songList.size() ) );//this.songIndex
+        //this.songIndex = (this.songIndex + 1 >= this.songList.size() ) ? 0 : this.songIndex + 1;
         return song;
 	}
-	
+
 	public File getNextMiscFile( SOUND_TYPE _soundType )
 	{
 		ArrayList<File> list = this.miscFileMap.get( _soundType );
-		
+
 		if ( list.isEmpty() )
 		{
 			return null;
 		}
-		
+
 		File file = list.get( 0 );
 		list.remove( 0 );
 		list.add( file );
