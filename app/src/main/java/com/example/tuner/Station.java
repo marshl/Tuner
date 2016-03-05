@@ -271,9 +271,10 @@ public class Station
 
 	public Song getNextSong()
 	{
-        Random rand = new Random();
-        Song song = this.getSongAtIndex( rand.nextInt( this.songList.size() ) );//this.songIndex
-        //this.songIndex = (this.songIndex + 1 >= this.songList.size() ) ? 0 : this.songIndex + 1;
+        Song song = this.getSongAtIndex(this.songIndex);
+        //Random rand = new Random();
+        //Song song = this.getSongAtIndex( rand.nextInt( this.songList.size() ) );//this.songIndex
+        this.songIndex = (this.songIndex + 1 >= this.songList.size() ) ? 0 : this.songIndex + 1;
         return song;
 	}
 
