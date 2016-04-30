@@ -9,37 +9,27 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class CustomLog
-{
-    public static File getFile()
-    {
-        File logFile = new File( Environment.getExternalStorageDirectory() + "/Tuner.log" );
-        if ( !logFile.exists() )
-        {
-            try
-            {
+public class CustomLog {
+    public static File getFile() {
+        File logFile = new File(Environment.getExternalStorageDirectory() + "/Tuner.log");
+        if (!logFile.exists()) {
+            try {
                 logFile.createNewFile();
-            }
-            catch ( IOException _e )
-            {
+            } catch (IOException _e) {
                 _e.printStackTrace();
             }
         }
         return logFile;
     }
 
-    public static void appendException( Exception _e )
-    {
+    public static void appendException(Exception _e) {
         StringBuilder out = new StringBuilder();
         StackTraceElement[] trace = _e.getStackTrace();
-        out.append( _e.toString() );
-        try
-        {
-            PrintStream stream = new PrintStream( getFile() );
-            _e.printStackTrace( stream );
-        }
-        catch (FileNotFoundException e)
-        {
+        out.append(_e.toString());
+        try {
+            PrintStream stream = new PrintStream(getFile());
+            _e.printStackTrace(stream);
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -51,20 +41,16 @@ public class CustomLog
         appendString(out.toString());*/
     }
 
-    public static void appendString( String _text )
-    {
+    public static void appendString(String _text) {
         File logFile = getFile();
 
-        try
-        {
+        try {
             //BufferedWriter for performance, true to set append to file flag
-            BufferedWriter buf = new BufferedWriter( new FileWriter( logFile, true ) );
-            buf.append( _text );
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(_text);
             buf.newLine();
             buf.close();
-        }
-        catch (IOException _e)
-        {
+        } catch (IOException _e) {
             _e.printStackTrace();
         }
     }
