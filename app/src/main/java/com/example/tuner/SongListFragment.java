@@ -24,7 +24,6 @@ public class SongListFragment extends DialogFragment {
         Bundle args = new Bundle();
         args.putInt(RADIO_ID_PARAM, station.getParentRadio().getIndex());
         args.putInt(STATION_ID_PARAM, station.getIndex());
-        //args.putSerializable(STATION_ID_PARAM, station);
         fragment.setArguments(args);
         return fragment;
     }
@@ -37,9 +36,6 @@ public class SongListFragment extends DialogFragment {
             int radioIndex = getArguments().getInt(RADIO_ID_PARAM);
             int stationIndex = getArguments().getInt(STATION_ID_PARAM);
             this.station = RadioMaster.instance.getRadio(radioIndex).getStation(stationIndex);
-
-            //this.station = (Station)getArguments().getSerializable(STATION_ID_PARAM);
-            //this.station = RadioMaster.instance.getRadio(this.radioIndex).getStation(this.stationIndex);
         }
     }
 

@@ -75,15 +75,11 @@ public class SongListAdapter implements ListAdapter {
         final TextView artistTextView = (TextView) convertView.findViewById(R.id.song_item_song_artist);
         artistTextView.setText(song.artist);
 
-        //final int songIndex = _position;
-        //final Song song = station.getSongAtIndex(_position);
-
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 TunerMain main = (TunerMain) context;
                 main.selectSong(song);
-                //main.selectSong(station.getParentRadio().radioIndex, station.stationIndex, songIndex);
                 fragmentParent.dismiss();
             }
         });

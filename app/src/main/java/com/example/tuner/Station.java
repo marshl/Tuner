@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class Station implements Serializable {
-    private int stationIndex;
     public String name;
     public String dj;
     public String genre;
@@ -30,34 +29,11 @@ public class Station implements Serializable {
     public boolean fullTrack = false;
     public boolean loadAll = false;
     public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
+    private int stationIndex;
     private Radio parentRadio;
     private File directory;
     private File iconFile;
     private ArrayList<Song> songList = new ArrayList<Song>();
-    //private int songIndex = 0;
-
-    public int getIndex()
-    {
-        return this.stationIndex;
-    }
-
-    public Song[] getSongs()
-    {
-        // Come back in 2017
-        //Collections.sort( this.songList, (o1,o2) -> o1.name.compareTo(o2.name));
-
-        ArrayList<Song> tempSongList = new ArrayList<Song>(this.songList);
-        Collections.sort(tempSongList, new Comparator<Song>() {
-            @Override
-            public int compare(Song o1, Song o2) {
-                return o1.name.compareTo(o2.name);
-            }
-        });
-
-        Song[] result = new Song[this.songList.size()];
-        result = tempSongList.toArray(result);
-        return result;
-    }
 
     public Station(Radio _parentRadio, int _stationIndex, String _dir) throws IOException, XmlPullParserException {
         this.stationIndex = _stationIndex;
@@ -82,6 +58,24 @@ public class Station implements Serializable {
         for (Entry<SOUND_TYPE, ArrayList<File>> entry : this.miscFileMap.entrySet()) {
             Collections.shuffle(entry.getValue());
         }
+    }
+
+    public int getIndex() {
+        return this.stationIndex;
+    }
+
+    public Song[] getSongs() {
+        ArrayList<Song> tempSongList = new ArrayList<Song>(this.songList);
+        Collections.sort(tempSongList, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.name.compareTo(o2.name);
+            }
+        });
+
+        Song[] result = new Song[this.songList.size()];
+        result = tempSongList.toArray(result);
+        return result;
     }
 
     private void loadXml() throws IOException, XmlPullParserException {
@@ -273,10 +267,6 @@ public class Station implements Serializable {
     public Song getSongAtIndex(int _position) {
         return _position < this.songList.size() ? this.songList.get(_position) : null;
     }
-
-    /*public void setSongIndex(int _songIndex) {
-        this.songIndex = _songIndex;
-    }*/
 
     public Radio getParentRadio() {
         return this.parentRadio;

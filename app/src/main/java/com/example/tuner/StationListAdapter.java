@@ -82,7 +82,7 @@ public class StationListAdapter implements ListAdapter {
         final ImageView iconView = (ImageView) _convertView.findViewById(R.id.station_list_station_icon);
         iconView.setImageBitmap(station.iconData);
 
-        _convertView.setOnClickListener(new StationListOnClickListener(this.context, station, this.fragmentParent.stationList));
+        _convertView.setOnClickListener(new StationListOnClickListener(station, this.fragmentParent.stationList));
 
         final int stationIndex = _position;
 
@@ -125,19 +125,14 @@ public class StationListAdapter implements ListAdapter {
     }
 
     public static class StationListOnClickListener implements OnClickListener {
-        //private Activity context;
 
         public Radio radio;
-        //public int radioIndex;
-        //public int stationIndex;
         public Station station;
 
         public ListView listView;
 
-        public StationListOnClickListener(Activity _context, Station station, ListView _listView) {
-            //this.context = _context;
-            //this.radioIndex = _radioIndex;
-            //this.stationIndex = _stationIndex;
+        public StationListOnClickListener(Station station, ListView _listView) {
+
             this.station = station;
             this.radio = this.station.getParentRadio();
             this.listView = _listView;
@@ -145,18 +140,10 @@ public class StationListAdapter implements ListAdapter {
 
         @Override
         public void onClick(View v) {
-            // Do not make any changes if the current playing station was selected
-
-            /*if (!RadioMaster.instance.isRadio(this.radioIndex)
-                    || !RadioMaster.instance.getCurrentRadio().isStation(this.stationIndex))*/
-
 
             if (this.radio.getParentMaster().getCurrentRadio() != this.station.getParentRadio()
-                    || this.station.getParentRadio().getCurrentStation() != this.station)
-            {
+                    || this.station.getParentRadio().getCurrentStation() != this.station) {
                 this.radio.getParentMaster().setCurrentRadio(this.radio);
-                //RadioMaster.instance.setCurrentRadio(this.radio);
-                //RadioMaster.instance.getCurrentRadio().setCurrentStation(this.station);
                 this.radio.setCurrentStation(this.station);
                 Log.i("TNR", "???");
                 try {

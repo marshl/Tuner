@@ -12,10 +12,8 @@ public class RadioFragment extends Fragment {
     private static String RADIO_ID_PARAM = "RADIO";
 
     public Activity context;
-    //public int radioIndex;
-    private  Radio radio;
-
     public ListView stationList;
+    private Radio radio;
 
     public RadioFragment() {
 
@@ -25,7 +23,6 @@ public class RadioFragment extends Fragment {
         RadioFragment fragment = new RadioFragment();
         Bundle args = new Bundle();
         args.putInt(RADIO_ID_PARAM, radio.getIndex());
-        //args.putSerializable(RADIO_ID_PARAM, radio);
         fragment.setArguments(args);
         return fragment;
     }
@@ -35,12 +32,8 @@ public class RadioFragment extends Fragment {
         super.onCreate(_savedInstanceState);
 
         if (this.getArguments() != null) {
-            //this.radioIndex = getArguments().getInt(RADIO_ID_PARAM);
-            //this.radio = RadioMaster.instance.getRadio(this.radioIndex);
-            //this.radio = (Radio)getArguments().getSerializable(RADIO_ID_PARAM);
             int radioIndex = this.getArguments().getInt(RADIO_ID_PARAM);
             this.radio = RadioMaster.instance.getRadio(radioIndex);
-            //String s =this.radio.name;
         }
     }
 
@@ -67,8 +60,7 @@ public class RadioFragment extends Fragment {
         this.context = null;
     }
 
-    public Radio getRadio()
-    {
+    public Radio getRadio() {
         return this.radio;
     }
 }

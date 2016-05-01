@@ -13,25 +13,15 @@ import java.util.Collections;
 import java.util.Random;
 
 public class RadioMaster {
-    //static public RadioMaster instance;
-    //public Activity context;
+    public static RadioMaster instance;
     private SOUND_TYPE lastPlayedSoundType = SOUND_TYPE.SONG;
+
     private ArrayList<Radio> radioList = new ArrayList<Radio>();
-
-    //private int currentRadioIndex = 0;
-
     private Radio currentRadio;
-    /*public RadioMaster(Activity _context) {
-        //RadioMaster.instance = this;
-        this.context = _context;
-    }*/
 
-    public RadioMaster()
-    {
+    public RadioMaster() {
         instance = this;
     }
-
-    public static RadioMaster instance;
 
     public static void skip(XmlPullParser _parser) throws XmlPullParserException, IOException {
         if (_parser.getEventType() != XmlPullParser.START_TAG) {
@@ -52,6 +42,14 @@ public class RadioMaster {
         }
     }
 
+    public static boolean checkFile(File _file) {
+        if (!_file.exists()) {
+            Log.w("TNR", "File not found: " + _file.toString());
+        }
+
+        return _file.exists();
+    }
+
     public void loadRadioDefinitions(String[] radioNames) throws IOException, XmlPullParserException {
         File rootFile = Environment.getExternalStorageDirectory();
         File musicFolder = new File(rootFile.toString() + "/Music");
@@ -70,14 +68,6 @@ public class RadioMaster {
         }
 
         this.currentRadio = this.radioList.get(0);
-    }
-
-    public static boolean checkFile(File _file) {
-        if (!_file.exists()) {
-            Log.w("TNR", "File not found: " + _file.toString());
-        }
-
-        return _file.exists();
     }
 
     public Radio getCurrentRadio() {
@@ -207,14 +197,6 @@ public class RadioMaster {
     public Radio getRadio(int _radioIndex) {
         return this.radioList.get(_radioIndex);
     }
-
-    /*public boolean isRadio(int _radioIndex) {
-        return this.currentRadioIndex == _radioIndex;
-    }
-
-    public int getRadioIndex() {
-        return this.currentRadioIndex;
-    }*/
 
     public enum SOUND_TYPE {
         GENERAL,

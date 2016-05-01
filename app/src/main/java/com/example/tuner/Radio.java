@@ -16,17 +16,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Radio implements Serializable{
-    //public int radioIndex;
-
-    private int index;
-
+public class Radio {
     public File directory;
     public String name = "UNDEFINED";
     public boolean songOverlay = false;
-
-    //private int currentStationIndex = 0;
-
+    private int index;
     private Station currentStation;
 
     private ArrayList<Station> stationList = new ArrayList<Station>();
@@ -37,7 +31,6 @@ public class Radio implements Serializable{
     private RadioMaster masterRadio;
 
     public Radio(RadioMaster master, int _index, File _directory) throws IOException, XmlPullParserException {
-        //this.radioIndex = _index;
         this.index = _index;
         this.directory = _directory;
         this.masterRadio = master;
@@ -149,17 +142,9 @@ public class Radio implements Serializable{
         }
     }
 
-    /*public Station getCurrentStation() {
-        return this.stationList.get(this.currentStationIndex);
-    }*/
-
-    public Station getCurrentStation(){
+    public Station getCurrentStation() {
         return this.currentStation;
     }
-
-    /*public void setCurrentStation(int _stationIndex) {
-        this.currentStationIndex = _stationIndex;
-    }*/
 
     public void setCurrentStation(Station station) {
 
@@ -167,7 +152,7 @@ public class Radio implements Serializable{
             throw new IllegalArgumentException("Station cannot be null");
         }
 
-        if ( !this.stationList.contains(station)) {
+        if (!this.stationList.contains(station)) {
             throw new IllegalArgumentException("Cannot switch to a station that isn't in this radio.");
         }
 
@@ -233,22 +218,15 @@ public class Radio implements Serializable{
         return this.stationList.get(_stationIndex);
     }
 
-    public int getIndex()
-    {
+    public int getIndex() {
         return this.index;
     }
 
-    /*public boolean isStation(int _stationIndex) {
-        return this.currentStationIndex == _stationIndex;
-    }*/
-
-    public boolean isSelected()
-    {
+    public boolean isSelected() {
         return this.masterRadio.getCurrentRadio() == this;
     }
 
-    public RadioMaster getParentMaster()
-    {
+    public RadioMaster getParentMaster() {
         return this.masterRadio;
     }
 }
