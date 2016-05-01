@@ -22,10 +22,12 @@ public class TunerAudioControl {
     private boolean mainWasPlaying = false;
     private boolean outroWasPlaying = false;
 
-    public TunerAudioControl(TunerMain _context) {
+    private final RadioMaster radioMaster;
+
+    public TunerAudioControl(TunerMain _context, RadioMaster radioMaster) {
         instance = this;
         this.context = _context;
-
+        this.radioMaster = radioMaster;
         this.mainPlayer = new MediaPlayer();
         this.introPlayer = new MediaPlayer();
         this.outroPlayer = new MediaPlayer();
@@ -43,21 +45,29 @@ public class TunerAudioControl {
             }
         };
 
-        this.onPreparationCompleteListener = new OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer _mediaPlayer) {
-                if (TunerAudioControl.instance.isResetting
-                        && RadioMaster.instance.getCurrentRadio().getCurrentStation().fullTrack) {
-                    _mediaPlayer.seekTo((int) (Math.random() * _mediaPlayer.getDuration()));
-                }
-                TunerAudioControl.instance.isResetting = false;
-                _mediaPlayer.start();
+        this.onPreparationCompleteListener = new TunerOnPreparedListener(this.radioMaster);
+    }
+
+    public class TunerOnPreparedListener implements OnPreparedListener {
+        public RadioMaster radioMaster;
+        public TunerOnPreparedListener(RadioMaster radioMaster)
+        {
+            this.radioMaster = radioMaster;
+        }
+
+        @Override
+        public void onPrepared(MediaPlayer _mediaPlayer) {
+            if (TunerAudioControl.instance.isResetting
+                    && this.radioMaster.getCurrentRadio().getCurrentStation().fullTrack) {
+                _mediaPlayer.seekTo((int) (Math.random() * _mediaPlayer.getDuration()));
             }
-        };
+            TunerAudioControl.instance.isResetting = false;
+            _mediaPlayer.start();
+        }
     }
 
     public void playNextItem() throws IOException {
-        this.playSound(RadioMaster.instance.getRandomSoundType(this.isResetting));
+        this.playSound(this.radioMaster.getRandomSoundType(this.isResetting));
     }
 
     public void playSound(RadioMaster.SOUND_TYPE _soundType) throws IOException {
@@ -73,7 +83,7 @@ public class TunerAudioControl {
         this.introPlayer = this.outroPlayer = null;
 
         // Play next item
-        SoundFileList fileList = RadioMaster.instance.getNextFileBlock(_soundType);
+        SoundFileList fileList = this.radioMaster.getNextFileBlock(_soundType);
         if (fileList != null) {
             this.playFileList(fileList);
             // Notify UI

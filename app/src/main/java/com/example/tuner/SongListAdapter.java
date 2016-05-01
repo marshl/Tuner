@@ -11,12 +11,13 @@ import android.widget.TextView;
 public class SongListAdapter implements ListAdapter {
     private SongListFragment fragmentParent;
     private Activity context;
-    private Station station;
 
-    public SongListAdapter(SongListFragment _fragmentParent, Station _station) {
+    private Song[] songs;
+
+    public SongListAdapter(SongListFragment _fragmentParent, Activity context, Song[] songs) {
         this.fragmentParent = _fragmentParent;
-        this.context = RadioMaster.instance.context;
-        this.station = _station;
+        this.context = context;
+        this.songs = songs;
     }
 
     @Override
@@ -41,12 +42,12 @@ public class SongListAdapter implements ListAdapter {
 
     @Override
     public int getCount() {
-        return this.station.getSongCount();
+        return this.songs.length;
     }
 
     @Override
-    public Object getItem(int _i) {
-        return this.station.getSongCount();
+    public Object getItem(int index) {
+        return this.songs[index];
     }
 
     @Override
@@ -60,31 +61,34 @@ public class SongListAdapter implements ListAdapter {
     }
 
     @Override
-    public View getView(int _position, View _convertView, ViewGroup _parent) {
-        if (_convertView == null) {
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
             LayoutInflater layoutInflater = this.context.getLayoutInflater();
-            _convertView = layoutInflater.inflate(R.layout.song_list_item, _parent, false);
+            convertView = layoutInflater.inflate(R.layout.song_list_item, parent, false);
         }
 
-        final Song song = this.station.getSongAtIndex(_position);
+        final Song song = this.songs[position];
 
-        final TextView nameTextView = (TextView) _convertView.findViewById(R.id.song_item_song_name);
+        final TextView nameTextView = (TextView) convertView.findViewById(R.id.song_item_song_name);
         nameTextView.setText(song.name);
 
-        final TextView artistTextView = (TextView) _convertView.findViewById(R.id.song_item_song_artist);
+        final TextView artistTextView = (TextView) convertView.findViewById(R.id.song_item_song_artist);
         artistTextView.setText(song.artist);
 
-        final int songIndex = _position;
-        _convertView.setOnClickListener(new View.OnClickListener() {
+        //final int songIndex = _position;
+        //final Song song = station.getSongAtIndex(_position);
+
+        convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 TunerMain main = (TunerMain) context;
-                main.selectSong(station.getParentRadio().radioIndex, station.stationIndex, songIndex);
+                main.selectSong(song);
+                //main.selectSong(station.getParentRadio().radioIndex, station.stationIndex, songIndex);
                 fragmentParent.dismiss();
             }
         });
 
-        return _convertView;
+        return convertView;
     }
 
     @Override
@@ -99,6 +103,6 @@ public class SongListAdapter implements ListAdapter {
 
     @Override
     public boolean isEmpty() {
-        return !this.station.hasSong();
+        return this.songs.length == 0;
     }
 }

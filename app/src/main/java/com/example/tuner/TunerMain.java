@@ -9,7 +9,6 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -19,6 +18,8 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
     private RadioPagerAdapter radioPagerAdapter;
     private ViewPager viewPager;
 
+    private static RadioMaster radioMasterInstance;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,10 +28,11 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
         CustomLog.appendString("Startup");
 
         final Activity context = this;
-        if (RadioMaster.instance == null) {
-            RadioMaster radioMaster = new RadioMaster(this);
+        if (radioMasterInstance == null) {
+            radioMasterInstance = new RadioMaster();
             try {
-                radioMaster.LoadRadioDefinitions();
+                String[] radioNames = this.getResources().getStringArray(R.array.radio_array);
+                radioMasterInstance.loadRadioDefinitions(radioNames);
             } catch (Exception _e) {
                 CustomLog.appendException(_e);
                 _e.printStackTrace();
@@ -66,31 +68,32 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
             }
         };
 
-        for (int i = 0; i < RadioMaster.instance.getRadioCount(); ++i) {
-            Radio radio = RadioMaster.instance.getRadio(i);
+        for (int i = 0; i < radioMasterInstance.getRadioCount(); ++i) {
+            Radio radio = radioMasterInstance.getRadio(i);
             ActionBar.Tab tab = actionBar.newTab();
             tab.setText(radio.name);
             tab.setTabListener(tabListener);
             actionBar.addTab(tab);
         }
 
-        actionBar.setSelectedNavigationItem(RadioMaster.instance.getRadioIndex());
+        //actionBar.setSelectedNavigationItem(RadioMaster.instance.getRadioIndex());
+        actionBar.setSelectedNavigationItem(radioMasterInstance.getCurrentRadio().getIndex());
 
         this.viewPager.setOnPageChangeListener
-                (
-                        new ViewPager.SimpleOnPageChangeListener() {
-                            @Override
-                            public void onPageSelected(int _position) {
-                                // When swiping between pages, select the
-                                // corresponding tab.
-                                getActionBar().setSelectedNavigationItem(_position);
+        (
+            new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int _position) {
+                    // When swiping between pages, select the
+                    // corresponding tab.
+                    getActionBar().setSelectedNavigationItem(_position);
 
-                            }
-                        }
-                );
+                }
+            }
+        );
 
         if (TunerAudioControl.instance == null) {
-            TunerAudioControl audioControl = new TunerAudioControl(this);
+            TunerAudioControl audioControl = new TunerAudioControl(this, radioMasterInstance);
             try {
                 audioControl.playNextItem();
             } catch (Exception _e) {
@@ -105,16 +108,16 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
     protected void onResume() {
         super.onResume();
-        RadioMaster.instance.context = this;
+        //radioMasterInstance.context = this;
     }
 
     protected void onPause() {
         super.onPause();
-        RadioMaster.instance.context = this;
+        //radioMasterInstance.context = this;
     }
 
     protected void onDestroy() {
-        RadioMaster.instance.context = this;
+        //RadioMaster.instance.context = this;
         super.onDestroy();
     }
 
@@ -147,20 +150,30 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
     }
 
-    public void selectSong(int _radioIndex, int _stationIndex, int _songIndex) {
-        Log.d("TNR", "Selecting Song on radio:" + _radioIndex + " station:" + _stationIndex + " song:" + _songIndex);
+    //public void selectSong(int _radioIndex, int _stationIndex, int _songIndex) {
+    public void selectSong(Song song) {
+        //Log.d("TNR", "Selecting Song on radio:" + _radioIndex + " station:" + _stationIndex + " song:" + _songIndex);
 
-        if (_radioIndex != this.viewPager.getCurrentItem()) {
+        /*if (_radioIndex != this.viewPager.getCurrentItem()) {
             this.viewPager.setCurrentItem(_radioIndex, true);
+        }*/
+
+        int radioIndex = song.getParentStation().getParentRadio().getIndex();
+        if (radioIndex != this.viewPager.getCurrentItem()) {
+            this.viewPager.setCurrentItem(radioIndex, true);
         }
 
         final Activity context = this;
         try {
             TunerAudioControl.instance.pause();
-            RadioMaster.instance.setCurrentRadio(_radioIndex);
-            RadioMaster.instance.getCurrentRadio().setCurrentStation(_stationIndex);
-            RadioMaster.instance.getCurrentRadio().getCurrentStation().setSongIndex(_songIndex);
-            TunerAudioControl.instance.playSound(RadioMaster.SOUND_TYPE.SONG);
+            radioMasterInstance.setCurrentRadio(song.getParentStation().getParentRadio());
+            radioMasterInstance.getCurrentRadio().setCurrentStation(song.getParentStation());
+            TunerAudioControl.instance.playFileList(song.getFileList());
+            //RadioMaster.instance.setCurrentRadio(_radioIndex);
+            //RadioMaster.instance.getCurrentRadio().setCurrentStation(_stationIndex);
+            //RadioMaster.instance.getCurrentRadio().getCurrentStation().setSongIndex(_songIndex);
+            //TunerAudioControl.instance.playSound(RadioMaster.SOUND_TYPE.SONG);
+            this.onSoundItemChange();
         } catch (Exception _e) {
             CustomLog.appendException(_e);
             _e.printStackTrace();
@@ -184,9 +197,12 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
         final TextView songArtistView = (TextView) this.findViewById(R.id.song_artist_text);
         songArtistView.setText(fileList.song != null ? fileList.song.artist : "");
+        songArtistView.invalidate();
+        songNameView.invalidate();
 
         final ImageButton playPauseButton = (ImageButton) this.findViewById(R.id.play_pause_button);
         playPauseButton.setImageResource(TunerAudioControl.instance.isPlaying ? R.drawable.ic_media_pause : R.drawable.ic_media_play);
+        playPauseButton.invalidate();
 
         this.viewPager.invalidate();
 
@@ -230,18 +246,18 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
         }
 
         @Override
-        public Fragment getItem(int _position) {
-            return RadioFragment.newInstance(_position);
+        public Fragment getItem(int position) {
+            return RadioFragment.newInstance(radioMasterInstance.getRadio(position));
         }
 
         @Override
         public int getCount() {
-            return RadioMaster.instance.getRadioCount();
+            return radioMasterInstance.getRadioCount();
         }
 
         @Override
         public CharSequence getPageTitle(int _position) {
-            return RadioMaster.instance.getRadio(_position).name;
+            return radioMasterInstance.getRadio(_position).name;
         }
     }
 }

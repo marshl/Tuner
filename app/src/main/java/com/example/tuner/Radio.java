@@ -11,33 +11,44 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Radio {
-    public int radioIndex;
+public class Radio implements Serializable{
+    //public int radioIndex;
+
+    private int index;
 
     public File directory;
     public String name = "UNDEFINED";
     public boolean songOverlay = false;
 
-    private int currentStationIndex = 0;
+    //private int currentStationIndex = 0;
+
+    private Station currentStation;
 
     private ArrayList<Station> stationList = new ArrayList<Station>();
     private ArrayList<File> advertList = new ArrayList<File>();
     private ArrayList<File> weatherList = new ArrayList<File>();
     private ArrayList<File> newsList = new ArrayList<File>();
 
-    public Radio(int _index, File _directory) throws IOException, XmlPullParserException {
-        this.radioIndex = _index;
+    private RadioMaster masterRadio;
+
+    public Radio(RadioMaster master, int _index, File _directory) throws IOException, XmlPullParserException {
+        //this.radioIndex = _index;
+        this.index = _index;
         this.directory = _directory;
+        this.masterRadio = master;
 
         this.loadXml();
 
         Collections.shuffle(this.advertList);
         Collections.shuffle(this.newsList);
         Collections.shuffle(this.weatherList);
+
+        this.currentStation = this.stationList.get(0);
     }
 
     private void loadXml() throws IOException, XmlPullParserException {
@@ -138,12 +149,29 @@ public class Radio {
         }
     }
 
-    public Station getCurrentStation() {
+    /*public Station getCurrentStation() {
         return this.stationList.get(this.currentStationIndex);
+    }*/
+
+    public Station getCurrentStation(){
+        return this.currentStation;
     }
 
-    public void setCurrentStation(int _stationIndex) {
+    /*public void setCurrentStation(int _stationIndex) {
         this.currentStationIndex = _stationIndex;
+    }*/
+
+    public void setCurrentStation(Station station) {
+
+        if (station == null) {
+            throw new IllegalArgumentException("Station cannot be null");
+        }
+
+        if ( !this.stationList.contains(station)) {
+            throw new IllegalArgumentException("Cannot switch to a station that isn't in this radio.");
+        }
+
+        this.currentStation = station;
     }
 
     public boolean canPlaySoundType(SOUND_TYPE _soundType) {
@@ -205,7 +233,22 @@ public class Radio {
         return this.stationList.get(_stationIndex);
     }
 
-    public boolean isStation(int _stationIndex) {
+    public int getIndex()
+    {
+        return this.index;
+    }
+
+    /*public boolean isStation(int _stationIndex) {
         return this.currentStationIndex == _stationIndex;
+    }*/
+
+    public boolean isSelected()
+    {
+        return this.masterRadio.getCurrentRadio() == this;
+    }
+
+    public RadioMaster getParentMaster()
+    {
+        return this.masterRadio;
     }
 }

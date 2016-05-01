@@ -11,6 +11,16 @@ public class Song {
     public ArrayList<File> introList = new ArrayList<File>();
     public ArrayList<File> outroList = new ArrayList<File>();
 
+    private Station parentStation;
+
+    public Song(Station station) {
+        this.parentStation = station;
+    }
+
+    public Station getParentStation() {
+        return this.parentStation;
+    }
+
     public File getNextIntro() {
         if (this.introList.isEmpty()) {
             return null;

@@ -1,6 +1,5 @@
 package com.example.tuner;
 
-import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
 
@@ -14,15 +13,25 @@ import java.util.Collections;
 import java.util.Random;
 
 public class RadioMaster {
-    static public RadioMaster instance;
-    public Activity context;
+    //static public RadioMaster instance;
+    //public Activity context;
     private SOUND_TYPE lastPlayedSoundType = SOUND_TYPE.SONG;
     private ArrayList<Radio> radioList = new ArrayList<Radio>();
-    private int currentRadioIndex = 0;
-    public RadioMaster(Activity _context) {
-        RadioMaster.instance = this;
+
+    //private int currentRadioIndex = 0;
+
+    private Radio currentRadio;
+    /*public RadioMaster(Activity _context) {
+        //RadioMaster.instance = this;
         this.context = _context;
+    }*/
+
+    public RadioMaster()
+    {
+        instance = this;
     }
+
+    public static RadioMaster instance;
 
     public static void skip(XmlPullParser _parser) throws XmlPullParserException, IOException {
         if (_parser.getEventType() != XmlPullParser.START_TAG) {
@@ -43,27 +52,27 @@ public class RadioMaster {
         }
     }
 
-    public void LoadRadioDefinitions() throws IOException, XmlPullParserException {
+    public void loadRadioDefinitions(String[] radioNames) throws IOException, XmlPullParserException {
         File rootFile = Environment.getExternalStorageDirectory();
         File musicFolder = new File(rootFile.toString() + "/Music");
         if (!musicFolder.exists()) {
             throw new IOException("Cannot find music directory");
         }
 
-        String[] radioNames = this.context.getResources().getStringArray(R.array.radio_array);
-
         for (String str : radioNames) {
             File radioDir = new File(musicFolder.toString() + "/" + str);
             if (radioDir.exists()) {
-                Radio radio = new Radio(this.radioList.size(), radioDir);
+                Radio radio = new Radio(this, this.radioList.size(), radioDir);
                 this.radioList.add(radio);
             } else {
                 Log.w("TNR", "Radio folder " + radioDir.toString() + " does not exist");
             }
         }
+
+        this.currentRadio = this.radioList.get(0);
     }
 
-    public boolean checkFile(File _file) {
+    public static boolean checkFile(File _file) {
         if (!_file.exists()) {
             Log.w("TNR", "File not found: " + _file.toString());
         }
@@ -72,11 +81,11 @@ public class RadioMaster {
     }
 
     public Radio getCurrentRadio() {
-        return this.radioList.get(this.currentRadioIndex);
+        return this.currentRadio;
     }
 
-    public void setCurrentRadio(int _radioIndex) {
-        this.currentRadioIndex = _radioIndex;
+    public void setCurrentRadio(Radio radio) {
+        this.currentRadio = radio;
     }
 
     public SoundFileList getNextFileBlock(SOUND_TYPE _soundType) throws IllegalArgumentException {
@@ -199,13 +208,13 @@ public class RadioMaster {
         return this.radioList.get(_radioIndex);
     }
 
-    public boolean isRadio(int _radioIndex) {
+    /*public boolean isRadio(int _radioIndex) {
         return this.currentRadioIndex == _radioIndex;
     }
 
     public int getRadioIndex() {
         return this.currentRadioIndex;
-    }
+    }*/
 
     public enum SOUND_TYPE {
         GENERAL,
@@ -220,6 +229,4 @@ public class RadioMaster {
         TO_WEATHER,
         TO_ADVERT,
     }
-
-
 }

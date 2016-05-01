@@ -13,20 +13,18 @@ public class SongListFragment extends DialogFragment {
     private static final String STATION_ID_PARAM = "STATION";
     private Activity context;
     private OnFragmentInteractionListener interactionListener;
-
-    private int radioIndex;
-    private int stationIndex;
     private Station station;
 
     public SongListFragment() {
 
     }
 
-    public static SongListFragment newInstance(int _radioIndex, int _stationIndex) {
+    public static SongListFragment newInstance(Station station) {
         SongListFragment fragment = new SongListFragment();
         Bundle args = new Bundle();
-        args.putInt(RADIO_ID_PARAM, _radioIndex);
-        args.putInt(STATION_ID_PARAM, _stationIndex);
+        args.putInt(RADIO_ID_PARAM, station.getParentRadio().getIndex());
+        args.putInt(STATION_ID_PARAM, station.getIndex());
+        //args.putSerializable(STATION_ID_PARAM, station);
         fragment.setArguments(args);
         return fragment;
     }
@@ -36,9 +34,12 @@ public class SongListFragment extends DialogFragment {
         super.onCreate(_savedInstanceState);
 
         if (this.getArguments() != null) {
-            this.radioIndex = getArguments().getInt(RADIO_ID_PARAM);
-            this.stationIndex = getArguments().getInt(STATION_ID_PARAM);
-            this.station = RadioMaster.instance.getRadio(this.radioIndex).getStation(this.stationIndex);
+            int radioIndex = getArguments().getInt(RADIO_ID_PARAM);
+            int stationIndex = getArguments().getInt(STATION_ID_PARAM);
+            this.station = RadioMaster.instance.getRadio(radioIndex).getStation(stationIndex);
+
+            //this.station = (Station)getArguments().getSerializable(STATION_ID_PARAM);
+            //this.station = RadioMaster.instance.getRadio(this.radioIndex).getStation(this.stationIndex);
         }
     }
 
@@ -46,8 +47,8 @@ public class SongListFragment extends DialogFragment {
     public View onCreateView(LayoutInflater _inflater, ViewGroup _container, Bundle _savedInstanceState) {
         View rootView = _inflater.inflate(R.layout.fragment_song_list, _container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.song_list_view);
-        listView.setAdapter(new SongListAdapter(this, this.station));
-        getDialog().setTitle(RadioMaster.instance.getRadio(this.radioIndex).name + ": " + this.station.name);
+        listView.setAdapter(new SongListAdapter(this, this.context, this.station.getSongs()));
+        getDialog().setTitle(this.station.getParentRadio().name + ": " + this.station.name);
         return rootView;
     }
 

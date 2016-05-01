@@ -14,13 +14,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-public class Station {
-    public int stationIndex;
+public class Station implements Serializable {
+    private int stationIndex;
     public String name;
     public String dj;
     public String genre;
@@ -32,7 +34,30 @@ public class Station {
     private File directory;
     private File iconFile;
     private ArrayList<Song> songList = new ArrayList<Song>();
-    private int songIndex = 0;
+    //private int songIndex = 0;
+
+    public int getIndex()
+    {
+        return this.stationIndex;
+    }
+
+    public Song[] getSongs()
+    {
+        // Come back in 2017
+        //Collections.sort( this.songList, (o1,o2) -> o1.name.compareTo(o2.name));
+
+        ArrayList<Song> tempSongList = new ArrayList<Song>(this.songList);
+        Collections.sort(tempSongList, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.name.compareTo(o2.name);
+            }
+        });
+
+        Song[] result = new Song[this.songList.size()];
+        result = tempSongList.toArray(result);
+        return result;
+    }
 
     public Station(Radio _parentRadio, int _stationIndex, String _dir) throws IOException, XmlPullParserException {
         this.stationIndex = _stationIndex;
@@ -53,6 +78,7 @@ public class Station {
 
         this.loadXml();
 
+        Collections.shuffle(this.songList);
         for (Entry<SOUND_TYPE, ArrayList<File>> entry : this.miscFileMap.entrySet()) {
             Collections.shuffle(entry.getValue());
         }
@@ -120,7 +146,7 @@ public class Station {
                 String filename = _parser.getAttributeValue(null, "file");
                 File file = new File(this.directory.toString() + "/" + filename);
 
-                if (!RadioMaster.instance.checkFile(file)) {
+                if (!RadioMaster.checkFile(file)) {
                     RadioMaster.skip(_parser);
                     continue;
                 }
@@ -166,7 +192,7 @@ public class Station {
                 continue;
             }
 
-            Song song = new Song();
+            Song song = new Song(this);
             // Remove file extension
             song.name = file.getName().replaceFirst("[.][^.]+$", "");
             song.artist = this.dj;
@@ -178,7 +204,7 @@ public class Station {
     private void readSong(XmlPullParser _parser) throws XmlPullParserException, IOException {
         _parser.require(XmlPullParser.START_TAG, null, "song");
 
-        Song song = new Song();
+        Song song = new Song(this);
 
         song.name = _parser.getAttributeValue(null, "name");
         song.artist = _parser.getAttributeValue(null, "artist");
@@ -196,7 +222,7 @@ public class Station {
                 String dir = _parser.getAttributeValue(null, "file");
 
                 File file = new File(this.directory.toString() + "/" + dir);
-                if (!RadioMaster.instance.checkFile(file)) {
+                if (!RadioMaster.checkFile(file)) {
                     RadioMaster.skip(_parser);
                     continue;
                 }
@@ -217,10 +243,9 @@ public class Station {
     }
 
     public Song getNextSong() {
-        Song song = this.getSongAtIndex(this.songIndex);
-        //Random rand = new Random();
-        //Song song = this.getSongAtIndex( rand.nextInt( this.songList.size() ) );//this.songIndex
-        this.songIndex = (this.songIndex + 1 >= this.songList.size()) ? 0 : this.songIndex + 1;
+        Song song = this.songList.get(0);
+        this.songList.remove(0);
+        this.songList.add(song);
         return song;
     }
 
@@ -249,9 +274,9 @@ public class Station {
         return _position < this.songList.size() ? this.songList.get(_position) : null;
     }
 
-    public void setSongIndex(int _songIndex) {
+    /*public void setSongIndex(int _songIndex) {
         this.songIndex = _songIndex;
-    }
+    }*/
 
     public Radio getParentRadio() {
         return this.parentRadio;
