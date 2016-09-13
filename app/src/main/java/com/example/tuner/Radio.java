@@ -11,15 +11,14 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Radio {
-    public File directory;
-    public String name = "UNDEFINED";
-    public boolean songOverlay = false;
+    private File directory;
+    private String name = "UNDEFINED";
+    private boolean songOverlay = false;
     private int index;
     private Station currentStation;
 
@@ -42,6 +41,10 @@ public class Radio {
         Collections.shuffle(this.weatherList);
 
         this.currentStation = this.stationList.get(0);
+    }
+
+    public boolean hasSongOverlays() {
+        return this.songOverlay;
     }
 
     private void loadXml() throws IOException, XmlPullParserException {
@@ -229,4 +232,8 @@ public class Radio {
     public RadioMaster getParentMaster() {
         return this.masterRadio;
     }
+
+    public File getDirectory() { return this.directory; }
+
+    public String getName() { return this.name; }
 }

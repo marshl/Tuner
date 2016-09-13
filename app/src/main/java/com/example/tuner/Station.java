@@ -38,7 +38,7 @@ public class Station implements Serializable {
     public Station(Radio _parentRadio, int _stationIndex, String _dir) throws IOException, XmlPullParserException {
         this.stationIndex = _stationIndex;
         this.parentRadio = _parentRadio;
-        this.directory = new File(this.parentRadio.directory.toString() + "/" + _dir);
+        this.directory = new File(this.parentRadio.getDirectory().toString() + "/" + _dir);
         if (!this.directory.exists()) {
             throw new IOException("Station directory \"" + this.directory.toString() + "\" not found");
         }

@@ -96,7 +96,7 @@ public class RadioMaster {
                     return null;
 
                 fileList = s.getFileList();
-                fileList.usesOverlay = this.getCurrentRadio().songOverlay;
+                fileList.usesOverlay = this.getCurrentRadio().hasSongOverlays();
 
                 if (fileList.usesOverlay) {
                     if (!playSongIntro) {

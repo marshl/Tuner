@@ -69,7 +69,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
         for (int i = 0; i < radioMasterInstance.getRadioCount(); ++i) {
             Radio radio = radioMasterInstance.getRadio(i);
             ActionBar.Tab tab = actionBar.newTab();
-            tab.setText(radio.name);
+            tab.setText(radio.getName());
             tab.setTabListener(tabListener);
             actionBar.addTab(tab);
         }
@@ -240,7 +240,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
         @Override
         public CharSequence getPageTitle(int _position) {
-            return radioMasterInstance.getRadio(_position).name;
+            return radioMasterInstance.getRadio(_position).getName();
         }
     }
 }
