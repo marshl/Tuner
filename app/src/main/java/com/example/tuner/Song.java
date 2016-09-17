@@ -4,17 +4,19 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Song {
-    public String name;
-    public String artist;
-    public File main;
+    private final String name;
+    private final String artist;
+    private File main;
 
-    public ArrayList<File> introList = new ArrayList<File>();
-    public ArrayList<File> outroList = new ArrayList<File>();
+    private final ArrayList<File> introList = new ArrayList<File>();
+    private final ArrayList<File> outroList = new ArrayList<File>();
 
-    private Station parentStation;
+    private final Station parentStation;
 
-    public Song(Station station) {
+    public Song(Station station, String name, String artist) {
         this.parentStation = station;
+        this.name = name;
+        this.artist = artist;
     }
 
     public Station getParentStation() {
@@ -53,5 +55,29 @@ public class Song {
         fileList.outroFile = this.getNextOutro();
 
         return fileList;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getArtist() {
+        return this.artist;
+    }
+
+    public File getMainFIle() {
+        return this.main;
+    }
+
+    public void addIntroFile(File file) {
+        this.introList.add(file);
+    }
+
+    public void addOutroFile(File file) {
+        this.outroList.add(file);
+    }
+
+    public void setMainFile(File file) {
+        this.main = file;
     }
 }

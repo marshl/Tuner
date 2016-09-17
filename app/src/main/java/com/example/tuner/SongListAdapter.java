@@ -9,10 +9,10 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class SongListAdapter implements ListAdapter {
-    private SongListFragment fragmentParent;
-    private Activity context;
+    private final SongListFragment fragmentParent;
+    private final Activity context;
 
-    private Song[] songs;
+    private final Song[] songs;
 
     public SongListAdapter(SongListFragment _fragmentParent, Activity context, Song[] songs) {
         this.fragmentParent = _fragmentParent;
@@ -70,10 +70,10 @@ public class SongListAdapter implements ListAdapter {
         final Song song = this.songs[position];
 
         final TextView nameTextView = (TextView) convertView.findViewById(R.id.song_item_song_name);
-        nameTextView.setText(song.name);
+        nameTextView.setText(song.getName());
 
         final TextView artistTextView = (TextView) convertView.findViewById(R.id.song_item_song_artist);
-        artistTextView.setText(song.artist);
+        artistTextView.setText(song.getArtist());
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override

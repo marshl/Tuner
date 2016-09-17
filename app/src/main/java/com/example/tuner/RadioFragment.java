@@ -9,10 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 public class RadioFragment extends Fragment {
-    private static String RADIO_ID_PARAM = "RADIO";
+    private final static String RADIO_ID_PARAM = "RADIO";
 
-    public Activity context;
-    public ListView stationList;
+    private Activity context;
+    private ListView stationList;
     private Radio radio;
 
     public RadioFragment() {
@@ -62,5 +62,10 @@ public class RadioFragment extends Fragment {
 
     public Radio getRadio() {
         return this.radio;
+    }
+
+    public ListView getStationList()
+    {
+        return this.stationList;
     }
 }

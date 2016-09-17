@@ -28,6 +28,4 @@
     <string name="play_pause_content_desc">Play/Pause</string>
     <string name="station_icon_content_desc">Station Icon</string>
 
-    <string name="son_item_song_name_default">[SONG_NAME]</string>
-
 </resources>

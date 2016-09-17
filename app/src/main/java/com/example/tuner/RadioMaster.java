@@ -16,7 +16,7 @@ public class RadioMaster {
     public static RadioMaster instance;
     private SOUND_TYPE lastPlayedSoundType = SOUND_TYPE.SONG;
 
-    private ArrayList<Radio> radioList = new ArrayList<Radio>();
+    private final ArrayList<Radio> radioList = new ArrayList<Radio>();
     private Radio currentRadio;
 
     public RadioMaster() {

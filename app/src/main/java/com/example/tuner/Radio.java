@@ -16,18 +16,18 @@ import java.util.Collections;
 import java.util.List;
 
 public class Radio {
-    private File directory;
+    private final File directory;
     private String name = "UNDEFINED";
     private boolean songOverlay = false;
-    private int index;
+    private final int index;
     private Station currentStation;
 
-    private ArrayList<Station> stationList = new ArrayList<Station>();
-    private ArrayList<File> advertList = new ArrayList<File>();
-    private ArrayList<File> weatherList = new ArrayList<File>();
-    private ArrayList<File> newsList = new ArrayList<File>();
+    private final ArrayList<Station> stationList = new ArrayList<Station>();
+    private final ArrayList<File> advertList = new ArrayList<File>();
+    private final ArrayList<File> weatherList = new ArrayList<File>();
+    private final ArrayList<File> newsList = new ArrayList<File>();
 
-    private RadioMaster masterRadio;
+    private final RadioMaster masterRadio;
 
     public Radio(RadioMaster master, int _index, File _directory) throws IOException, XmlPullParserException {
         this.index = _index;
@@ -168,17 +168,17 @@ public class Radio {
             case ADVERT:
                 return this.advertList.size() > 0;
             case GENERAL:
-                return station.miscFileMap.get(SOUND_TYPE.GENERAL).size() > 0;
+                return station.getMiscFileMap().get(SOUND_TYPE.GENERAL).size() > 0;
             case ID:
-                return station.miscFileMap.get(SOUND_TYPE.ID).size() > 0;
+                return station.getMiscFileMap().get(SOUND_TYPE.ID).size() > 0;
             case NEWS:
                 return this.newsList.size() > 0;
             case SONG:
                 return station.hasSong();
             case TIME:
-                return station.miscFileMap.get(SOUND_TYPE.TIME).size() > 0;
+                return station.getMiscFileMap().get(SOUND_TYPE.TIME).size() > 0;
             case WEATHER:
-                return station.miscFileMap.get(SOUND_TYPE.WEATHER).size() > 0
+                return station.getMiscFileMap().get(SOUND_TYPE.WEATHER).size() > 0
                         || this.weatherList.size() > 0;
             case TO_WEATHER:
             case TO_NEWS:
@@ -233,7 +233,11 @@ public class Radio {
         return this.masterRadio;
     }
 
-    public File getDirectory() { return this.directory; }
+    public File getDirectory() {
+        return this.directory;
+    }
 
-    public String getName() { return this.name; }
+    public String getName() {
+        return this.name;
+    }
 }

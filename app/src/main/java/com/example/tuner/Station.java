@@ -22,18 +22,19 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class Station implements Serializable {
-    public String name;
-    public String dj;
-    public String genre;
-    public Bitmap iconData;
-    public boolean fullTrack = false;
-    public boolean loadAll = false;
-    public HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
-    private int stationIndex;
-    private Radio parentRadio;
-    private File directory;
-    private File iconFile;
-    private ArrayList<Song> songList = new ArrayList<Song>();
+
+    private String name;
+    private String dj;
+    private String genre;
+    private Bitmap iconData;
+    private boolean isFullTrack = false;
+    private boolean loadAll = false;
+    private final HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
+    private final int stationIndex;
+    private final Radio parentRadio;
+
+    private final File directory;
+    private final ArrayList<Song> songList = new ArrayList<Song>();
 
     public Station(Radio _parentRadio, int _stationIndex, String _dir) throws IOException, XmlPullParserException {
         this.stationIndex = _stationIndex;
@@ -69,7 +70,7 @@ public class Station implements Serializable {
         Collections.sort(tempSongList, new Comparator<Song>() {
             @Override
             public int compare(Song o1, Song o2) {
-                return o1.name.compareTo(o2.name);
+                return o1.getName().compareTo(o2.getName());
             }
         });
 
@@ -111,8 +112,8 @@ public class Station implements Serializable {
 
         String iconName = _parser.getAttributeValue(null, "icon");
         if (iconName != null) {
-            this.iconFile = new File(this.directory + "/" + iconName);
-            File pngFile = new File(this.iconFile.toString().replaceFirst(".bmp", ".png"));
+            File iconFile = new File(this.directory + "/" + iconName);
+            File pngFile = new File(iconFile.toString().replaceFirst(".bmp", ".png"));
             if (pngFile.isFile()) {
                 this.iconData = BitmapFactory.decodeFile(pngFile.toString());
             } else {
@@ -121,7 +122,7 @@ public class Station implements Serializable {
         }
 
         String fullTrackStr = _parser.getAttributeValue(null, "fulltrack");
-        this.fullTrack = fullTrackStr != null && fullTrackStr.equals("true");
+        this.isFullTrack = fullTrackStr != null && fullTrackStr.equals("true");
 
         while (_parser.next() != XmlPullParser.END_TAG) {
             if (_parser.getEventType() != XmlPullParser.START_TAG) {
@@ -186,11 +187,10 @@ public class Station implements Serializable {
                 continue;
             }
 
-            Song song = new Song(this);
-            // Remove file extension
-            song.name = file.getName().replaceFirst("[.][^.]+$", "");
-            song.artist = this.dj;
-            song.main = file;
+            // Remove file extension to get the song name
+            String songName = file.getName().replaceFirst("[.][^.]+$", "");
+            Song song = new Song(this, songName, this.dj);
+            song.setMainFile(file);
             this.songList.add(song);
         }
     }
@@ -198,10 +198,11 @@ public class Station implements Serializable {
     private void readSong(XmlPullParser _parser) throws XmlPullParserException, IOException {
         _parser.require(XmlPullParser.START_TAG, null, "song");
 
-        Song song = new Song(this);
+        String songName = _parser.getAttributeValue(null, "name");
+        String songArtist = _parser.getAttributeValue(null, "artist");
 
-        song.name = _parser.getAttributeValue(null, "name");
-        song.artist = _parser.getAttributeValue(null, "artist");
+        Song song = new Song(this, songName, songArtist);
+
 
         while (_parser.next() != XmlPullParser.END_TAG) {
             if (_parser.getEventType() != XmlPullParser.START_TAG) {
@@ -222,11 +223,11 @@ public class Station implements Serializable {
                 }
 
                 if (name.equals("in")) {
-                    song.introList.add(file);
+                    song.addIntroFile(file);
                 } else if (name.equals("out")) {
-                    song.outroList.add(file);
+                    song.addOutroFile(file);
                 } else {
-                    song.main = file;
+                    song.setMainFile(file);
                 }
                 RadioMaster.skip(_parser);
             } else {
@@ -256,6 +257,22 @@ public class Station implements Serializable {
         return file;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDj() {
+        return this.dj;
+    }
+
+    public String getGenre() {
+        return this.genre;
+    }
+
+    public Bitmap getIconData() {
+        return this.iconData;
+    }
+
     public boolean hasSong() {
         return !this.songList.isEmpty();
     }
@@ -270,5 +287,14 @@ public class Station implements Serializable {
 
     public Radio getParentRadio() {
         return this.parentRadio;
+    }
+
+    public HashMap<SOUND_TYPE, ArrayList<File>> getMiscFileMap() {
+        return this.miscFileMap;
+    }
+
+    public boolean getIsFullTrack()
+    {
+        return this.isFullTrack;
     }
 }

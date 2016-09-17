@@ -7,17 +7,17 @@ import android.media.MediaPlayer.OnPreparedListener;
 import java.io.IOException;
 
 public class TunerAudioControl {
-    public static TunerAudioControl instance;
+    private static TunerAudioControl instance;
     private final RadioMaster radioMaster;
-    public TunerMain context;
-    public boolean isPlaying = true;
-    public SoundFileList fileList;
-    public boolean isResetting = true;
+    private final TunerMain context;
+    private boolean isPlaying = true;
+    private SoundFileList fileList;
+    private boolean isResetting = true;
     private MediaPlayer mainPlayer;
     private MediaPlayer introPlayer;
     private MediaPlayer outroPlayer;
-    private OnCompletionListener onSongFinishedListener;
-    private OnPreparedListener onPreparationCompleteListener;
+    private final OnCompletionListener onSongFinishedListener;
+    private final OnPreparedListener onPreparationCompleteListener;
     private boolean introWasPlaying = false;
     private boolean mainWasPlaying = false;
     private boolean outroWasPlaying = false;
@@ -29,6 +29,7 @@ public class TunerAudioControl {
         this.mainPlayer = new MediaPlayer();
         this.introPlayer = new MediaPlayer();
         this.outroPlayer = new MediaPlayer();
+        this.outroPlayer.setVolume(0.5f, 0.5f);
 
         this.onSongFinishedListener = new OnCompletionListener() {
             @Override
@@ -159,7 +160,7 @@ public class TunerAudioControl {
     }
 
     public class TunerOnPreparedListener implements OnPreparedListener {
-        public RadioMaster radioMaster;
+        private final RadioMaster radioMaster;
 
         public TunerOnPreparedListener(RadioMaster radioMaster) {
             this.radioMaster = radioMaster;
@@ -168,11 +169,27 @@ public class TunerAudioControl {
         @Override
         public void onPrepared(MediaPlayer _mediaPlayer) {
             if (TunerAudioControl.instance.isResetting
-                    && this.radioMaster.getCurrentRadio().getCurrentStation().fullTrack) {
+                    && this.radioMaster.getCurrentRadio().getCurrentStation().getIsFullTrack()) {
                 _mediaPlayer.seekTo((int) (Math.random() * _mediaPlayer.getDuration()));
             }
             TunerAudioControl.instance.isResetting = false;
             _mediaPlayer.start();
         }
+    }
+
+    public void setIsResetting(boolean isResetting) {
+        this.isResetting = isResetting;
+    }
+
+    public boolean getIsPlaying() {
+        return this.isPlaying;
+    }
+
+    public static TunerAudioControl getInstance() {
+        return instance;
+    }
+
+    public SoundFileList getFileList() {
+        return this.fileList;
     }
 }

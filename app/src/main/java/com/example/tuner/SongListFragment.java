@@ -44,7 +44,7 @@ public class SongListFragment extends DialogFragment {
         View rootView = _inflater.inflate(R.layout.fragment_song_list, _container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.song_list_view);
         listView.setAdapter(new SongListAdapter(this, this.context, this.station.getSongs()));
-        getDialog().setTitle(this.station.getParentRadio().getName() + ": " + this.station.name);
+        getDialog().setTitle(this.station.getParentRadio().getName() + ": " + this.station.getName());
         return rootView;
     }
 
@@ -77,7 +77,7 @@ public class SongListFragment extends DialogFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(int _songIndex);
+        void onFragmentInteraction(int _songIndex);
     }
 
 }

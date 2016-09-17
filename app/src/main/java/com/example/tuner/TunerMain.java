@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 public class TunerMain extends Activity implements SongListFragment.OnFragmentInteractionListener {
     private static RadioMaster radioMasterInstance;
-    private RadioPagerAdapter radioPagerAdapter;
     private ViewPager viewPager;
 
     @Override
@@ -38,11 +37,11 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
             }
         }
 
-        this.radioPagerAdapter = new RadioPagerAdapter(this.getFragmentManager());
+        RadioPagerAdapter radioPagerAdapter = new RadioPagerAdapter(this.getFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         this.viewPager = (ViewPager) this.findViewById(R.id.radio_view_pager);
-        this.viewPager.setAdapter(this.radioPagerAdapter);
+        this.viewPager.setAdapter(radioPagerAdapter);
 
         final ActionBar actionBar = this.getActionBar();
         // Specify that tabs should be displayed in the action bar.
@@ -89,7 +88,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
                         }
                 );
 
-        if (TunerAudioControl.instance == null) {
+        if (TunerAudioControl.getInstance() == null) {
             TunerAudioControl audioControl = new TunerAudioControl(this, radioMasterInstance);
             try {
                 audioControl.playNextItem();
@@ -118,11 +117,11 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
     public void onPlayPauseButtonClick(View _view) {
         final ImageButton playPauseButton = (ImageButton) this.findViewById(R.id.play_pause_button);
 
-        if (TunerAudioControl.instance.isPlaying) {
-            TunerAudioControl.instance.pause();
+        if (TunerAudioControl.getInstance().getIsPlaying()) {
+            TunerAudioControl.getInstance().pause();
             playPauseButton.setImageResource(R.drawable.ic_media_play);
         } else {
-            TunerAudioControl.instance.resume();
+            TunerAudioControl.getInstance().resume();
             playPauseButton.setImageResource(R.drawable.ic_media_pause);
         }
     }
@@ -130,7 +129,7 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
     // Do not change syntax
     public void onSkipButtonClick(View _view) {
         try {
-            TunerAudioControl.instance.playNextItem();
+            TunerAudioControl.getInstance().playNextItem();
         } catch (Exception _e) {
             CustomLog.appendException(_e);
             _e.printStackTrace();
@@ -152,10 +151,10 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
         final Activity context = this;
         try {
-            TunerAudioControl.instance.pause();
+            TunerAudioControl.getInstance().pause();
             radioMasterInstance.setCurrentRadio(song.getParentStation().getParentRadio());
             radioMasterInstance.getCurrentRadio().setCurrentStation(song.getParentStation());
-            TunerAudioControl.instance.playFileList(song.getFileList());
+            TunerAudioControl.getInstance().playFileList(song.getFileList());
             this.onSoundItemChange();
         } catch (Exception _e) {
             CustomLog.appendException(_e);
@@ -165,13 +164,13 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
     }
 
     public void onSoundItemChange() {
-        SoundFileList fileList = TunerAudioControl.instance.fileList;
+        SoundFileList fileList = TunerAudioControl.getInstance().getFileList();
 
         final TextView songNameView = (TextView) this.findViewById(R.id.song_name_text);
 
         String label;
         if (fileList.song != null) {
-            label = fileList.song.name;
+            label = fileList.song.getName();
         } else {
             label = soundTypeToLabel(fileList.type);
         }
@@ -179,12 +178,12 @@ public class TunerMain extends Activity implements SongListFragment.OnFragmentIn
 
 
         final TextView songArtistView = (TextView) this.findViewById(R.id.song_artist_text);
-        songArtistView.setText(fileList.song != null ? fileList.song.artist : "");
+        songArtistView.setText(fileList.song != null ? fileList.song.getArtist() : "");
         songArtistView.invalidate();
         songNameView.invalidate();
 
         final ImageButton playPauseButton = (ImageButton) this.findViewById(R.id.play_pause_button);
-        playPauseButton.setImageResource(TunerAudioControl.instance.isPlaying ? R.drawable.ic_media_pause : R.drawable.ic_media_play);
+        playPauseButton.setImageResource(TunerAudioControl.getInstance().getIsPlaying() ? R.drawable.ic_media_pause : R.drawable.ic_media_play);
         playPauseButton.invalidate();
 
         this.viewPager.invalidate();

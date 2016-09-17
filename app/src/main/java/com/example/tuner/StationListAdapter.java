@@ -15,8 +15,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class StationListAdapter implements ListAdapter {
-    private Activity context;
-    private RadioFragment fragmentParent;
+    private final Activity context;
+    private final RadioFragment fragmentParent;
 
     public StationListAdapter(Activity _context, RadioFragment _fragmentParent) {
         this.context = _context;
@@ -71,20 +71,18 @@ public class StationListAdapter implements ListAdapter {
         stationRoot.setBackgroundColor(selected ? 0xff666666 : 0x00000000);
 
         final TextView nameTextView = (TextView) _convertView.findViewById(R.id.station_list_station_name);
-        nameTextView.setText(station.name);
+        nameTextView.setText(station.getName());
 
         final TextView djTextView = (TextView) _convertView.findViewById(R.id.station_list_station_dj);
-        djTextView.setText(station.dj);
+        djTextView.setText(station.getDj());
 
         final TextView genreTextView = (TextView) _convertView.findViewById(R.id.station_list_station_genre);
-        genreTextView.setText(station.genre);
+        genreTextView.setText(station.getGenre());
 
         final ImageView iconView = (ImageView) _convertView.findViewById(R.id.station_list_station_icon);
-        iconView.setImageBitmap(station.iconData);
+        iconView.setImageBitmap(station.getIconData());
 
-        _convertView.setOnClickListener(new StationListOnClickListener(station, this.fragmentParent.stationList));
-
-        final int stationIndex = _position;
+        _convertView.setOnClickListener(new StationListOnClickListener(station, this.fragmentParent.getStationList()));
 
         _convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -126,10 +124,10 @@ public class StationListAdapter implements ListAdapter {
 
     public static class StationListOnClickListener implements OnClickListener {
 
-        public Radio radio;
-        public Station station;
+        private final Radio radio;
+        private final Station station;
 
-        public ListView listView;
+        private final  ListView listView;
 
         public StationListOnClickListener(Station station, ListView _listView) {
 
@@ -147,8 +145,8 @@ public class StationListAdapter implements ListAdapter {
                 this.radio.setCurrentStation(this.station);
                 Log.i("TNR", "???");
                 try {
-                    TunerAudioControl.instance.isResetting = true;
-                    TunerAudioControl.instance.playNextItem();
+                    TunerAudioControl.getInstance().setIsResetting(true);
+                    TunerAudioControl.getInstance().playNextItem();
                 } catch (Exception _e) {
                     CustomLog.appendException(_e);
                     _e.printStackTrace();
