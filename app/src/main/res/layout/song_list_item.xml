@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="5dp">
 
     <TextView
+        android:id="@+id/song_item_song_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="[SONG_NAME]"
-        android:id="@+id/song_item_song_name" />
+        android:text="@string/default_song_name"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
+        android:id="@+id/song_item_song_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/default_song_artist"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="[SONG_ARTIST]"
-        android:id="@+id/song_item_song_artist"
         android:textColor="@android:color/darker_gray" />
 
 </LinearLayout>

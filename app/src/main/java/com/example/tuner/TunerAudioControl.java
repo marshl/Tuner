@@ -12,12 +12,10 @@ public class TunerAudioControl {
     private final TunerMain context;
     private boolean isPlaying = true;
     private SoundFileList fileList;
-    private boolean isResetting = true;
     private MediaPlayer mainPlayer;
     private MediaPlayer introPlayer;
     private MediaPlayer outroPlayer;
     private final OnCompletionListener onSongFinishedListener;
-    private final OnPreparedListener onPreparationCompleteListener;
     private boolean introWasPlaying = false;
     private boolean mainWasPlaying = false;
     private boolean outroWasPlaying = false;
@@ -30,12 +28,14 @@ public class TunerAudioControl {
         this.introPlayer = new MediaPlayer();
         this.outroPlayer = new MediaPlayer();
         this.outroPlayer.setVolume(0.5f, 0.5f);
+        this.introPlayer.setVolume(0.5f, 0.5f);
+        this.mainPlayer.setVolume(0.5f, 0.5f);
 
         this.onSongFinishedListener = new OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer _mediaPlayer) {
                 try {
-                    TunerAudioControl.instance.playNextItem();
+                    TunerAudioControl.instance.playNextItem(false);
                 } catch (Exception _e) {
                     CustomLog.appendException(_e);
                     _e.printStackTrace();
@@ -43,21 +43,20 @@ public class TunerAudioControl {
                 }
             }
         };
-
-        this.onPreparationCompleteListener = new TunerOnPreparedListener(this.radioMaster);
     }
 
-    public void playNextItem() throws IOException {
-        this.playSound(this.radioMaster.getRandomSoundType(this.isResetting));
+    public void playNextItem(boolean reset) throws IOException {
+        this.playSound(this.radioMaster.getRandomSoundType(reset), reset);
     }
 
-    public void playSound(RadioMaster.SOUND_TYPE _soundType) throws IOException {
+    private void playSound(RadioMaster.SOUND_TYPE _soundType, boolean reset) throws IOException {
         // Unpause and release
         this.isPlaying = true;
         this.mainPlayer.release();
         if (this.introPlayer != null) {
             this.introPlayer.release();
         }
+
         if (this.outroPlayer != null) {
             this.outroPlayer.release();
         }
@@ -66,13 +65,13 @@ public class TunerAudioControl {
         // Play next item
         SoundFileList fileList = this.radioMaster.getNextFileBlock(_soundType);
         if (fileList != null) {
-            this.playFileList(fileList);
+            this.playFileList(fileList, reset);
             // Notify UI
             this.context.onSoundItemChange();
         }
     }
 
-    public void playFileList(SoundFileList _fileList) throws IOException {
+    public void playFileList(SoundFileList _fileList, boolean reset) throws IOException {
         this.fileList = _fileList;
 
         this.mainPlayer = new MediaPlayer();
@@ -85,7 +84,7 @@ public class TunerAudioControl {
             this.introPlayer.prepare();
 
             // The intro is the start of the song (in both sequence and overlay mode)
-            this.introPlayer.setOnPreparedListener(this.onPreparationCompleteListener);
+            this.introPlayer.setOnPreparedListener(new TunerOnPreparedListener(this.radioMaster, reset));
         }
 
         this.mainPlayer.setDataSource(_fileList.mainFile.toString());
@@ -93,7 +92,7 @@ public class TunerAudioControl {
 
         // The main is the start of the song if in overlay mode or there is no intro
         if (_fileList.introFile == null || _fileList.usesOverlay) {
-            this.mainPlayer.setOnPreparedListener(this.onPreparationCompleteListener);
+            this.mainPlayer.setOnPreparedListener(new TunerOnPreparedListener(this.radioMaster, reset));
         }
 
         if (_fileList.outroFile != null) {
@@ -161,24 +160,20 @@ public class TunerAudioControl {
 
     public class TunerOnPreparedListener implements OnPreparedListener {
         private final RadioMaster radioMaster;
+        private final boolean isResetting;
 
-        public TunerOnPreparedListener(RadioMaster radioMaster) {
+        public TunerOnPreparedListener(RadioMaster radioMaster, boolean reset) {
             this.radioMaster = radioMaster;
+            this.isResetting = reset;
         }
 
         @Override
         public void onPrepared(MediaPlayer _mediaPlayer) {
-            if (TunerAudioControl.instance.isResetting
-                    && this.radioMaster.getCurrentRadio().getCurrentStation().getIsFullTrack()) {
+            if (this.isResetting && this.radioMaster.getCurrentRadio().getCurrentStation().getIsFullTrack()) {
                 _mediaPlayer.seekTo((int) (Math.random() * _mediaPlayer.getDuration()));
             }
-            TunerAudioControl.instance.isResetting = false;
             _mediaPlayer.start();
         }
-    }
-
-    public void setIsResetting(boolean isResetting) {
-        this.isResetting = isResetting;
     }
 
     public boolean getIsPlaying() {

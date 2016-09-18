@@ -27,5 +27,7 @@
     <string name="next_song_content_desc">Next Song</string>
     <string name="play_pause_content_desc">Play/Pause</string>
     <string name="station_icon_content_desc">Station Icon</string>
+    <string name="default_song_name">[SONG]</string>
+    <string name="default_song_artist">[ARTIST]</string>
 
 </resources>

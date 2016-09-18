@@ -12,7 +12,6 @@ public class SongListFragment extends DialogFragment {
     private static final String RADIO_ID_PARAM = "RADIO";
     private static final String STATION_ID_PARAM = "STATION";
     private Activity context;
-    private OnFragmentInteractionListener interactionListener;
     private Station station;
 
     public SongListFragment() {
@@ -52,32 +51,10 @@ public class SongListFragment extends DialogFragment {
     public void onAttach(Activity _activity) {
         super.onAttach(_activity);
         this.context = _activity;
-        try {
-            this.interactionListener = (OnFragmentInteractionListener) _activity;
-        } catch (ClassCastException _e) {
-            throw new ClassCastException(_activity.toString() + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        this.interactionListener = null;
     }
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(int _songIndex);
-    }
-
 }

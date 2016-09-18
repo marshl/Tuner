@@ -43,11 +43,12 @@ public class RadioMaster {
     }
 
     public static boolean checkFile(File _file) {
-        if (!_file.exists()) {
-            Log.w("TNR", "File not found: " + _file.toString());
+        if (_file.exists()) {
+            return true;
         }
 
-        return _file.exists();
+        Log.w("TNR", "File not found: " + _file.toString());
+        return false;
     }
 
     public void loadRadioDefinitions(String[] radioNames) throws IOException, XmlPullParserException {

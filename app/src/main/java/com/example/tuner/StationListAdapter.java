@@ -82,7 +82,7 @@ public class StationListAdapter implements ListAdapter {
         final ImageView iconView = (ImageView) _convertView.findViewById(R.id.station_list_station_icon);
         iconView.setImageBitmap(station.getIconData());
 
-        _convertView.setOnClickListener(new StationListOnClickListener(station, this.fragmentParent.getStationList()));
+        _convertView.setOnClickListener(new StationListOnClickListener(this.context, station, this.fragmentParent.getStationList()));
 
         _convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -93,6 +93,9 @@ public class StationListAdapter implements ListAdapter {
                 return true;
             }
         });
+
+        Log.d("TNR", "Creating a view for " + station.getName());
+        Log.d("TNR", "Station selection: " + selected);
 
         return _convertView;
     }
@@ -127,10 +130,11 @@ public class StationListAdapter implements ListAdapter {
         private final Radio radio;
         private final Station station;
 
-        private final  ListView listView;
+        private final ListView listView;
+        private final Activity context;
 
-        public StationListOnClickListener(Station station, ListView _listView) {
-
+        public StationListOnClickListener(Activity context, Station station, ListView _listView) {
+            this.context = context;
             this.station = station;
             this.radio = this.station.getParentRadio();
             this.listView = _listView;
@@ -143,20 +147,18 @@ public class StationListAdapter implements ListAdapter {
                     || this.station.getParentRadio().getCurrentStation() != this.station) {
                 this.radio.getParentMaster().setCurrentRadio(this.radio);
                 this.radio.setCurrentStation(this.station);
-                Log.i("TNR", "???");
+
                 try {
-                    TunerAudioControl.getInstance().setIsResetting(true);
-                    TunerAudioControl.getInstance().playNextItem();
+                    TunerAudioControl.getInstance().playNextItem(true);
                 } catch (Exception _e) {
                     CustomLog.appendException(_e);
                     _e.printStackTrace();
                     throw new RuntimeException(_e);
                 }
             }
-
+            Log.d("TNR", this.station.getName() + " was just clicked");
             this.listView.invalidate();
+            ((TunerMain)context).onSoundItemChange();
         }
     }
-
-
 }

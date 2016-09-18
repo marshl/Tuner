@@ -3,6 +3,7 @@ package com.example.tuner;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ public class RadioFragment extends Fragment {
     private Radio radio;
 
     public RadioFragment() {
-
+        Log.d("TNR", "Creating Fragment Parent");
     }
 
     public static RadioFragment newInstance(Radio radio) {
@@ -34,6 +35,7 @@ public class RadioFragment extends Fragment {
         if (this.getArguments() != null) {
             int radioIndex = this.getArguments().getInt(RADIO_ID_PARAM);
             this.radio = RadioMaster.instance.getRadio(radioIndex);
+            Log.d("TNR", "Creating radio fragment for " + this.radio.getName());
         }
     }
 
@@ -45,6 +47,7 @@ public class RadioFragment extends Fragment {
 
         this.stationList = (ListView) rootView.findViewById(R.id.station_list);
         this.stationList.setAdapter(new StationListAdapter(this.context, this));
+        Log.d("TNR", "Recreating StationListAdapter");
         return rootView;
     }
 

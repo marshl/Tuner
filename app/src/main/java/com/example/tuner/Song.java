@@ -23,7 +23,7 @@ public class Song {
         return this.parentStation;
     }
 
-    public File getNextIntro() {
+    private File getNextIntro() {
         if (this.introList.isEmpty()) {
             return null;
         }
@@ -34,7 +34,7 @@ public class Song {
         return intro;
     }
 
-    public File getNextOutro() {
+    private File getNextOutro() {
         if (this.outroList.isEmpty()) {
             return null;
         }
@@ -63,10 +63,6 @@ public class Song {
 
     public String getArtist() {
         return this.artist;
-    }
-
-    public File getMainFIle() {
-        return this.main;
     }
 
     public void addIntroFile(File file) {

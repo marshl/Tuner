@@ -32,13 +32,6 @@ public class CustomLog {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        /*for ( StackTraceElement element : trace )
-        {
-            out.append( element.toString() ).append( '\n' );
-        }
-
-        appendString(out.toString());*/
     }
 
     public static void appendString(String _text) {

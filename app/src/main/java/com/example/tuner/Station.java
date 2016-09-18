@@ -28,7 +28,6 @@ public class Station implements Serializable {
     private String genre;
     private Bitmap iconData;
     private boolean isFullTrack = false;
-    private boolean loadAll = false;
     private final HashMap<SOUND_TYPE, ArrayList<File>> miscFileMap = new HashMap<SOUND_TYPE, ArrayList<File>>();
     private final int stationIndex;
     private final Radio parentRadio;
@@ -104,9 +103,9 @@ public class Station implements Serializable {
         this.genre = _parser.getAttributeValue(null, "genre");
 
         String loadAllStr = _parser.getAttributeValue(null, "loadall");
-        this.loadAll = loadAllStr != null && loadAllStr.equals("true");
+        boolean loadAll = loadAllStr != null && loadAllStr.equals("true");
 
-        if (this.loadAll) {
+        if (loadAll) {
             this.loadAllMusicFiles();
         }
 
@@ -277,14 +276,6 @@ public class Station implements Serializable {
         return !this.songList.isEmpty();
     }
 
-    public int getSongCount() {
-        return this.songList.size();
-    }
-
-    public Song getSongAtIndex(int _position) {
-        return _position < this.songList.size() ? this.songList.get(_position) : null;
-    }
-
     public Radio getParentRadio() {
         return this.parentRadio;
     }
@@ -293,8 +284,7 @@ public class Station implements Serializable {
         return this.miscFileMap;
     }
 
-    public boolean getIsFullTrack()
-    {
+    public boolean getIsFullTrack() {
         return this.isFullTrack;
     }
 }
