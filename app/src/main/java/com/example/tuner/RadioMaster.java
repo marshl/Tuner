@@ -80,15 +80,13 @@ public class RadioMaster {
     }
 
     public SoundFileList getNextFileBlock(SOUND_TYPE _soundType) throws IllegalArgumentException {
-        SoundFileList fileList = null;
+        SoundFileList fileList;
 
         final Radio currentRadio = this.getCurrentRadio();
         final Station currentStation = currentRadio.getCurrentStation();
 
         Random tempRand = new Random();
         boolean playMiscIntro = tempRand.nextFloat() > 0.5f;
-        boolean playSongIntro = tempRand.nextFloat() > 0.5f;
-        boolean playSongOutro = tempRand.nextFloat() > 0.5f;
 
         if (_soundType == SOUND_TYPE.SONG) {
             Song s = currentStation.getNextSong();
@@ -96,6 +94,7 @@ public class RadioMaster {
                 return null;
 
             fileList = s.getFileList();
+
         } else {
             fileList = new SoundFileList(_soundType, null);
 

@@ -2,6 +2,7 @@ package com.example.tuner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Song {
     private final String name;
@@ -23,7 +24,11 @@ public class Song {
         return this.parentStation;
     }
 
-    private File getNextIntro() {
+    public File getMain() {
+        return this.main;
+    }
+
+    public File getNextIntro() {
         if (this.introList.isEmpty()) {
             return null;
         }
@@ -34,7 +39,7 @@ public class Song {
         return intro;
     }
 
-    private File getNextOutro() {
+    public File getNextOutro() {
         if (this.outroList.isEmpty()) {
             return null;
         }
@@ -48,8 +53,12 @@ public class Song {
     public SoundFileList getFileList() {
         SoundFileList fileList = new SoundFileList(RadioMaster.SOUND_TYPE.SONG, this);
 
-        File intro = this.getNextIntro();
-        File outro = this.getNextOutro();
+        Random tempRand = new Random();
+        boolean playSongIntro = !this.parentStation.getParentRadio().hasSongOverlays() || tempRand.nextFloat() > 0.5f;
+        boolean playSongOutro = !this.parentStation.getParentRadio().hasSongOverlays() || tempRand.nextFloat() > 0.5f;
+
+        File intro = playSongIntro ? this.getNextIntro() : null;
+        File outro = playSongOutro ? this.getNextOutro() : null;
 
         if (intro != null) {
             fileList.addFile(intro);
