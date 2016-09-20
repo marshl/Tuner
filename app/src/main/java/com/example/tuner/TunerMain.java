@@ -150,6 +150,7 @@ public class TunerMain extends Activity {
             radioMasterInstance.setCurrentRadio(song.getParentStation().getParentRadio());
             radioMasterInstance.getCurrentRadio().setCurrentStation(song.getParentStation());
             TunerAudioControl.getInstance().playSoundList(song.getFileList(), true);
+            song.getParentStation().pushSongToEnd(song);
             this.onSoundItemChange();
         } catch (Exception _e) {
             CustomLog.appendException(_e);

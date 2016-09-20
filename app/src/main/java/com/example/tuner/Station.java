@@ -293,4 +293,13 @@ public class Station implements Serializable {
     public boolean getIsFullTrack() {
         return this.isFullTrack;
     }
+
+    public void pushSongToEnd(Song song) {
+        if (!this.songList.contains(song)) {
+            throw new IllegalArgumentException("The given song is not in this station");
+        }
+
+        this.songList.remove(song);
+        this.songList.add(song);
+    }
 }
