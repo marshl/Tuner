@@ -3,33 +3,28 @@ package com.example.tuner;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TunerAudioControl {
     private static TunerAudioControl instance;
     private final RadioMaster radioMaster;
     private final TunerMain context;
     private boolean isPlaying = true;
-    private SoundFileList fileList;
-    private MediaPlayer mainPlayer;
-    private MediaPlayer introPlayer;
-    private MediaPlayer outroPlayer;
+    private SoundFileList soundFileList;
+    private List<MediaPlayer> mediaPlayerList;
     private final OnCompletionListener onSongFinishedListener;
-    private boolean introWasPlaying = false;
-    private boolean mainWasPlaying = false;
-    private boolean outroWasPlaying = false;
+    private MediaPlayer pausedPlayer;
 
     public TunerAudioControl(TunerMain _context, RadioMaster radioMaster) {
         instance = this;
+        this.mediaPlayerList = new ArrayList<MediaPlayer>();
         this.context = _context;
         this.radioMaster = radioMaster;
-        this.mainPlayer = new MediaPlayer();
-        this.introPlayer = new MediaPlayer();
-        this.outroPlayer = new MediaPlayer();
-        this.outroPlayer.setVolume(0.5f, 0.5f);
-        this.introPlayer.setVolume(0.5f, 0.5f);
-        this.mainPlayer.setVolume(0.5f, 0.5f);
 
         this.onSongFinishedListener = new OnCompletionListener() {
             @Override
@@ -46,130 +41,97 @@ public class TunerAudioControl {
     }
 
     public void playNextItem(boolean reset) throws IOException {
-        this.playSound(this.radioMaster.getRandomSoundType(reset), reset);
+        SoundFileList fileList = this.radioMaster.getNextFileBlock(this.radioMaster.getRandomSoundType(reset));
+        this.playSoundList(fileList, reset);
     }
 
-    private void playSound(RadioMaster.SOUND_TYPE _soundType, boolean reset) throws IOException {
-        // Unpause and release
+    public void playSoundList(SoundFileList soundList, boolean reset) throws IOException {
         this.isPlaying = true;
-        this.mainPlayer.release();
-        if (this.introPlayer != null) {
-            this.introPlayer.release();
+        this.pausedPlayer = null;
+        this.soundFileList = soundList;
+
+        for (MediaPlayer player : this.mediaPlayerList) {
+            player.release();
         }
 
-        if (this.outroPlayer != null) {
-            this.outroPlayer.release();
+        this.mediaPlayerList = new ArrayList<MediaPlayer>();
+
+        while (this.mediaPlayerList.size() < soundList.getFileCount()) {
+            MediaPlayer player = new MediaPlayer();
+            player.setVolume(0.5f, 0.5f);
+            this.mediaPlayerList.add(player);
         }
-        this.introPlayer = this.outroPlayer = null;
-
-        // Play next item
-        SoundFileList fileList = this.radioMaster.getNextFileBlock(_soundType);
-        if (fileList != null) {
-            this.playFileList(fileList, reset);
-            // Notify UI
-            this.context.onSoundItemChange();
-        }
-    }
-
-    public void playFileList(SoundFileList _fileList, boolean reset) throws IOException {
-        this.fileList = _fileList;
-
-        this.mainPlayer = new MediaPlayer();
-        this.introPlayer = null;
-        this.outroPlayer = null;
-
-        if (_fileList.introFile != null) {
-            this.introPlayer = new MediaPlayer();
-            this.introPlayer.setDataSource(_fileList.introFile.toString());
-            this.introPlayer.prepare();
-
-            // The intro is the start of the song (in both sequence and overlay mode)
-            this.introPlayer.setOnPreparedListener(new TunerOnPreparedListener(this.radioMaster, reset));
+        Log.d("TNR", "Type: " + soundList.getSoundType());
+        Log.d("TNR", soundList.getSong() != null ? soundList.getSong().getName() : "No song");
+        Log.d("TNR", "File Count: " + soundList.getFileCount());
+        Log.d("TNR", "Player Count: " + this.mediaPlayerList.size());
+        for (int i = 0; i < soundList.getFileCount(); ++i) {
+            File file = soundList.getFileAtIndex(i);
+            MediaPlayer player = this.mediaPlayerList.get(i);
+            Log.d("TNR", "File exists: " + file.exists());
+            Log.d("TNR", "File: " + file != null ? file.toString() : "NULL");
+            String path = file.getAbsolutePath();
+            player.setDataSource(path);
         }
 
-        this.mainPlayer.setDataSource(_fileList.mainFile.toString());
-        this.mainPlayer.prepare();
+        MediaPlayer firstPlayer = this.mediaPlayerList.get(0);
+        firstPlayer.setOnPreparedListener(new TunerOnPreparedListener(this, reset));
 
-        // The main is the start of the song if in overlay mode or there is no intro
-        if (_fileList.introFile == null || _fileList.usesOverlay) {
-            this.mainPlayer.setOnPreparedListener(new TunerOnPreparedListener(this.radioMaster, reset));
+        for (MediaPlayer player : this.mediaPlayerList) {
+            player.prepare();
         }
 
-        if (_fileList.outroFile != null) {
-            this.outroPlayer = new MediaPlayer();
-            this.outroPlayer.setDataSource(_fileList.outroFile.toString());
-            this.outroPlayer.prepare();
-
-            // The song ends after the outro if in sequence mode
-            if (!_fileList.usesOverlay) {
-                this.outroPlayer.setOnCompletionListener(this.onSongFinishedListener);
-            }
+        for (int i = 0; i < this.mediaPlayerList.size() - 1; ++i) {
+            MediaPlayer player = this.mediaPlayerList.get(i);
+            MediaPlayer nextPlayer = this.mediaPlayerList.get(i + 1);
+            player.setNextMediaPlayer(nextPlayer);
         }
 
-        // The song ends after main if in sequence mode or no outro
-        if (_fileList.outroFile == null || _fileList.usesOverlay) {
-            this.mainPlayer.setOnCompletionListener(this.onSongFinishedListener);
-        }
+        MediaPlayer lastPlayer = this.mediaPlayerList.get(this.mediaPlayerList.size() - 1);
+        lastPlayer.setOnCompletionListener(this.onSongFinishedListener);
 
-        // When in sequence mode, get the players to player after the other
-        if (!_fileList.usesOverlay) {
-            if (this.introPlayer != null) {
-                this.introPlayer.setNextMediaPlayer(this.mainPlayer);
-            }
-
-            if (this.outroPlayer != null) {
-                this.mainPlayer.setNextMediaPlayer(this.outroPlayer);
-            }
-        }
+        this.context.onSoundItemChange();
     }
 
     public void pause() {
         this.isPlaying = false;
+        this.pausedPlayer = null;
 
-        this.introWasPlaying = this.introPlayer != null && this.introPlayer.isPlaying();
-        if (this.introWasPlaying) {
-            this.introPlayer.pause();
-        }
-
-        this.mainWasPlaying = this.mainPlayer != null && this.mainPlayer.isPlaying();
-        if (this.mainWasPlaying) {
-            this.mainPlayer.pause();
-        }
-
-        this.outroWasPlaying = this.outroPlayer != null && this.outroPlayer.isPlaying();
-        if (this.outroWasPlaying) {
-            this.outroPlayer.pause();
+        for (MediaPlayer player : this.mediaPlayerList) {
+            if (player.isPlaying()) {
+                this.pausedPlayer = player;
+                player.pause();
+                break;
+            }
         }
     }
 
     public void resume() {
+        if (this.isPlaying) {
+            return;
+        }
+
         this.isPlaying = true;
 
-        if (this.introWasPlaying) {
-            this.introPlayer.start();
-        }
+        assert (this.pausedPlayer != null);
 
-        if (this.mainWasPlaying) {
-            this.mainPlayer.start();
-        }
-
-        if (this.outroWasPlaying) {
-            this.outroPlayer.start();
-        }
+        this.pausedPlayer.start();
+        this.pausedPlayer = null;
     }
 
     public class TunerOnPreparedListener implements OnPreparedListener {
-        private final RadioMaster radioMaster;
+        private final TunerAudioControl audioControl;
         private final boolean isResetting;
 
-        public TunerOnPreparedListener(RadioMaster radioMaster, boolean reset) {
-            this.radioMaster = radioMaster;
+        public TunerOnPreparedListener(TunerAudioControl audioControl, boolean reset) {
+            this.audioControl = audioControl;
             this.isResetting = reset;
         }
 
         @Override
         public void onPrepared(MediaPlayer _mediaPlayer) {
-            if (this.isResetting && this.radioMaster.getCurrentRadio().getCurrentStation().getIsFullTrack()) {
+
+            if (this.isResetting && this.audioControl.radioMaster.getCurrentRadio().getCurrentStation().getIsFullTrack()) {
                 _mediaPlayer.seekTo((int) (Math.random() * _mediaPlayer.getDuration()));
             }
             _mediaPlayer.start();
@@ -184,7 +146,7 @@ public class TunerAudioControl {
         return instance;
     }
 
-    public SoundFileList getFileList() {
-        return this.fileList;
+    public SoundFileList getSoundFileList() {
+        return this.soundFileList;
     }
 }

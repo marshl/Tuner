@@ -149,7 +149,7 @@ public class TunerMain extends Activity {
             TunerAudioControl.getInstance().pause();
             radioMasterInstance.setCurrentRadio(song.getParentStation().getParentRadio());
             radioMasterInstance.getCurrentRadio().setCurrentStation(song.getParentStation());
-            TunerAudioControl.getInstance().playFileList(song.getFileList(), true);
+            TunerAudioControl.getInstance().playSoundList(song.getFileList(), true);
             this.onSoundItemChange();
         } catch (Exception _e) {
             CustomLog.appendException(_e);
@@ -160,20 +160,20 @@ public class TunerMain extends Activity {
 
     public void onSoundItemChange() {
         Log.d("TNR", "onSoundItemChange");
-        SoundFileList fileList = TunerAudioControl.getInstance().getFileList();
+        SoundFileList fileList = TunerAudioControl.getInstance().getSoundFileList();
 
         final TextView songNameView = (TextView) this.findViewById(R.id.song_name_text);
 
         String label;
-        if (fileList.song != null) {
-            label = fileList.song.getName();
+        if (fileList.getSong() != null) {
+            label = fileList.getSong().getName();
         } else {
-            label = soundTypeToLabel(fileList.type);
+            label = soundTypeToLabel(fileList.getSoundType());
         }
         songNameView.setText(label);
 
         final TextView songArtistView = (TextView) this.findViewById(R.id.song_artist_text);
-        songArtistView.setText(fileList.song != null ? fileList.song.getArtist() : "");
+        songArtistView.setText(fileList.getSong() != null ? fileList.getSong().getArtist() : "");
         songArtistView.invalidate();
         songNameView.invalidate();
 

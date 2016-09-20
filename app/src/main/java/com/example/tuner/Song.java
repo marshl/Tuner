@@ -46,13 +46,20 @@ public class Song {
     }
 
     public SoundFileList getFileList() {
-        SoundFileList fileList = new SoundFileList();
+        SoundFileList fileList = new SoundFileList(RadioMaster.SOUND_TYPE.SONG, this);
 
-        fileList.song = this;
-        fileList.mainFile = this.main;
+        File intro = this.getNextIntro();
+        File outro = this.getNextOutro();
 
-        fileList.introFile = this.getNextIntro();
-        fileList.outroFile = this.getNextOutro();
+        if (intro != null) {
+            fileList.addFile(intro);
+        }
+
+        fileList.addFile(this.main);
+
+        if (outro != null) {
+            fileList.addFile(outro);
+        }
 
         return fileList;
     }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class Station implements Serializable {
@@ -241,6 +242,11 @@ public class Station implements Serializable {
         this.songList.remove(0);
         this.songList.add(song);
         return song;
+    }
+
+    public boolean hasFileOfType(SOUND_TYPE soundType) {
+        List<File> list = this.miscFileMap.get(soundType);
+        return !list.isEmpty();
     }
 
     public File getNextMiscFile(SOUND_TYPE _soundType) {

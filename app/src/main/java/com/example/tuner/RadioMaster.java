@@ -80,7 +80,7 @@ public class RadioMaster {
     }
 
     public SoundFileList getNextFileBlock(SOUND_TYPE _soundType) throws IllegalArgumentException {
-        SoundFileList fileList = new SoundFileList();
+        SoundFileList fileList = null;
 
         final Radio currentRadio = this.getCurrentRadio();
         final Station currentStation = currentRadio.getCurrentStation();
@@ -90,64 +90,61 @@ public class RadioMaster {
         boolean playSongIntro = tempRand.nextFloat() > 0.5f;
         boolean playSongOutro = tempRand.nextFloat() > 0.5f;
 
-        switch (_soundType) {
-            case SONG: {
-                Song s = currentStation.getNextSong();
-                if (s == null)
-                    return null;
+        if (_soundType == SOUND_TYPE.SONG) {
+            Song s = currentStation.getNextSong();
+            if (s == null)
+                return null;
 
-                fileList = s.getFileList();
-                fileList.usesOverlay = this.getCurrentRadio().hasSongOverlays();
+            fileList = s.getFileList();
+        } else {
+            fileList = new SoundFileList(_soundType, null);
 
-                if (fileList.usesOverlay) {
-                    if (!playSongIntro) {
-                        fileList.introFile = null;
+            switch (_soundType) {
+                case ADVERT: {
+                    if (playMiscIntro && currentStation.hasFileOfType(SOUND_TYPE.TO_ADVERT)) {
+                        fileList.addFile(currentStation.getNextMiscFile(SOUND_TYPE.TO_ADVERT));
                     }
-                    if (!playSongOutro) {
-                        fileList.outroFile = null;
-                    }
-                }
-                break;
-            }
-            case ADVERT: {
-                fileList.mainFile = currentRadio.getNextAdvert();
-                if (playMiscIntro) {
-                    fileList.introFile = currentStation.getNextMiscFile(SOUND_TYPE.TO_ADVERT);
-                }
-                break;
-            }
-            case GENERAL:
-            case ID:
-            case TIME: {
-                fileList.mainFile = this.getCurrentRadio().getCurrentStation().getNextMiscFile(_soundType);
-                break;
-            }
-            case WEATHER: {
-                if (this.getCurrentRadio().hasWeather()) {
-                    fileList.mainFile = this.getCurrentRadio().getNextWeather();
-                } else {
-                    fileList.mainFile = this.getCurrentRadio().getCurrentStation().getNextMiscFile(_soundType);
-                }
 
-                if (playMiscIntro) {
-                    fileList.introFile = currentStation.getNextMiscFile(SOUND_TYPE.TO_WEATHER);
+                    fileList.addFile(currentRadio.getNextAdvert());
+                    break;
                 }
-                break;
-            }
-            case NEWS: {
-                fileList.mainFile = this.getCurrentRadio().getNextNews();
-                if (playMiscIntro) {
-                    fileList.introFile = currentStation.getNextMiscFile(SOUND_TYPE.TO_NEWS);
+                case GENERAL:
+                case ID:
+                case TIME: {
+                    if (currentStation.hasFileOfType(_soundType)) {
+                        fileList.addFile(currentStation.getNextMiscFile(_soundType));
+                    }
+                    break;
                 }
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("Uncaught SOUND_TYPE " + _soundType);
+                case WEATHER: {
+                    if (playMiscIntro && currentStation.hasFileOfType(SOUND_TYPE.TO_WEATHER)) {
+                        fileList.addFile(currentStation.getNextMiscFile(SOUND_TYPE.TO_WEATHER));
+                    }
+
+                    if (this.getCurrentRadio().hasWeather()) {
+                        fileList.addFile(this.getCurrentRadio().getNextWeather());
+                    } else if (currentStation.hasFileOfType(_soundType)) {
+                        fileList.addFile(currentStation.getNextMiscFile(_soundType));
+                    }
+
+                    break;
+                }
+                case NEWS: {
+                    if (playMiscIntro && currentStation.hasFileOfType(SOUND_TYPE.TO_NEWS)) {
+                        fileList.addFile(currentStation.getNextMiscFile(SOUND_TYPE.TO_NEWS));
+                    }
+
+                    fileList.addFile(this.getCurrentRadio().getNextNews());
+
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException("Uncaught SOUND_TYPE " + _soundType);
+                }
             }
         }
 
         this.lastPlayedSoundType = _soundType;
-        fileList.type = _soundType;
         return fileList;
     }
 
