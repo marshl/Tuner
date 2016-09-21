@@ -208,4 +208,31 @@ public class RadioMaster {
         TO_WEATHER,
         TO_ADVERT,
     }
+
+    public static String soundTypeToLabel(RadioMaster.SOUND_TYPE _soundType) {
+        switch (_soundType) {
+            case GENERAL:
+                return "General";
+            case WEATHER:
+                return "Weather";
+            case ID:
+                return "Station ID";
+            case TIME:
+                return "Time";
+            case SONG:
+                return "Song";
+            case ADVERT:
+                return "Advert";
+            case NEWS:
+                return "News";
+            case TO_NEWS:
+                return "News Transition";
+            case TO_WEATHER:
+                return "Weather Transition";
+            case TO_ADVERT:
+                return "Advert Transition";
+            default:
+                throw new IllegalArgumentException("Uncaught SOUND_TYPE" + _soundType);
+        }
+    }
 }

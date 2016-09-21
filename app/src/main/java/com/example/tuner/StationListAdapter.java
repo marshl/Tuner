@@ -149,7 +149,7 @@ public class StationListAdapter implements ListAdapter {
                 this.radio.setCurrentStation(this.station);
 
                 try {
-                    TunerAudioControl.getInstance().playNextItem(true);
+                    ((TunerMain)this.context).audioService.playNextItem(true);
                 } catch (Exception _e) {
                     CustomLog.appendException(_e);
                     _e.printStackTrace();

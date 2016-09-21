@@ -30,4 +30,11 @@
     <string name="default_song_name">[SONG]</string>
     <string name="default_song_artist">[ARTIST]</string>
 
+
+    <string name="local_service_started">[LOCAL_SERVICE_STARTED]</string>
+    <string name="local_service_stopped">[LOCAL_SERVICE_STOPPED]</string>
+    <string name="local_service_connected">[LOCAL_SERVICE_CONNECTED]</string>
+    <string name="local_service_disconnected">[LOCAL_SERVICE_DISCONNECTED]</string>
+    <string name="local_service_label">[LOCAL_SERVICE_LABEL]</string>
+
 </resources>

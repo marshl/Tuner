@@ -1,44 +1,32 @@
 package com.example.tuner;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.os.Binder;
+import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TunerAudioControl {
-    private static TunerAudioControl instance;
-    private final RadioMaster radioMaster;
-    private final TunerMain context;
+public class TunerAudioControl extends Service {
+    public RadioMaster radioMaster;
+    public TunerMain context;
     private boolean isPlaying = true;
     private SoundFileList soundFileList;
-    private List<MediaPlayer> mediaPlayerList;
-    private final OnCompletionListener onSongFinishedListener;
+    private List<MediaPlayer> mediaPlayerList = new ArrayList<MediaPlayer>();
     private MediaPlayer pausedPlayer;
-
-    public TunerAudioControl(TunerMain _context, RadioMaster radioMaster) {
-        instance = this;
-        this.mediaPlayerList = new ArrayList<MediaPlayer>();
-        this.context = _context;
-        this.radioMaster = radioMaster;
-
-        this.onSongFinishedListener = new OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer _mediaPlayer) {
-                try {
-                    TunerAudioControl.instance.playNextItem(false);
-                } catch (Exception _e) {
-                    CustomLog.appendException(_e);
-                    _e.printStackTrace();
-                    throw new RuntimeException(_e);
-                }
-            }
-        };
-    }
 
     public void playNextItem(boolean reset) throws IOException {
         SoundFileList fileList = this.radioMaster.getNextFileBlock(this.radioMaster.getRandomSoundType(reset));
@@ -61,15 +49,10 @@ public class TunerAudioControl {
             player.setVolume(0.5f, 0.5f);
             this.mediaPlayerList.add(player);
         }
-        Log.d("TNR", "Type: " + soundList.getSoundType());
-        Log.d("TNR", soundList.getSong() != null ? soundList.getSong().getName() : "No song");
-        Log.d("TNR", "File Count: " + soundList.getFileCount());
-        Log.d("TNR", "Player Count: " + this.mediaPlayerList.size());
+
         for (int i = 0; i < soundList.getFileCount(); ++i) {
             File file = soundList.getFileAtIndex(i);
             MediaPlayer player = this.mediaPlayerList.get(i);
-            Log.d("TNR", "File exists: " + file.exists());
-            Log.d("TNR", "File: " + file != null ? file.toString() : "NULL");
             String path = file.getAbsolutePath();
             player.setDataSource(path);
         }
@@ -88,7 +71,18 @@ public class TunerAudioControl {
         }
 
         MediaPlayer lastPlayer = this.mediaPlayerList.get(this.mediaPlayerList.size() - 1);
-        lastPlayer.setOnCompletionListener(this.onSongFinishedListener);
+        lastPlayer.setOnCompletionListener(new OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer _mediaPlayer) {
+                try {
+                    TunerAudioControl.this.playNextItem(false);
+                } catch (Exception _e) {
+                    CustomLog.appendException(_e);
+                    _e.printStackTrace();
+                    throw new RuntimeException(_e);
+                }
+            }
+        });
 
         this.context.onSoundItemChange();
     }
@@ -119,6 +113,40 @@ public class TunerAudioControl {
         this.pausedPlayer = null;
     }
 
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    private final IBinder mBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        TunerAudioControl getService() {
+            return TunerAudioControl.this;
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        this.showNotification();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startID) {
+        Log.i("LocalService", "Received start id " + startID + ": " + intent);
+
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        this.notificationManager.cancel(this.NOTIFICATION);
+
+        // Tell the user we stopped.
+        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
+    }
+
     public class TunerOnPreparedListener implements OnPreparedListener {
         private final TunerAudioControl audioControl;
         private final boolean isResetting;
@@ -142,11 +170,34 @@ public class TunerAudioControl {
         return this.isPlaying;
     }
 
-    public static TunerAudioControl getInstance() {
-        return instance;
-    }
-
     public SoundFileList getSoundFileList() {
         return this.soundFileList;
     }
+
+    private void showNotification() {
+        // In this sample, we'll use the same text for the ticker and the expanded notification
+        CharSequence text = getText(R.string.local_service_started);
+
+        // The PendingIntent to launch our activity if the user selects this notification
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, TunerMain.class), 0);
+
+        // Set the info for the views that show in the notification panel.
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_launcher)  // the status icon
+                .setTicker(text)  // the status text
+                .setWhen(System.currentTimeMillis())  // the time stamp
+                .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
+                .setContentText(text)  // the contents of the entry
+                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                .build();
+
+        // Send the notification.
+        this.notificationManager.notify(NOTIFICATION, notification);
+    }
+
+    private NotificationManager notificationManager;
+
+    private int NOTIFICATION = R.string.local_service_started;
+
 }
