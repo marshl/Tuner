@@ -17,8 +17,8 @@
 
     <string name="title_activity_tuner_main">Tuner</string>
     
-    <string name="song_artist_default_text">[SONG_NAME]</string>
-    <string name="song_name_default_text">[SONG_NAME]</string>
+    <string name="song_artist_default_text"/>
+    <string name="song_name_default_text">Pick a Station</string>
     
     <string name="station_dj_default_text">[STATION_DJ]</string>
     <string name="station_genre_default_text">[STATION_GENRE]</string>
@@ -31,10 +31,10 @@
     <string name="default_song_artist">[ARTIST]</string>
 
 
-    <string name="local_service_started">[LOCAL_SERVICE_STARTED]</string>
-    <string name="local_service_stopped">[LOCAL_SERVICE_STOPPED]</string>
-    <string name="local_service_connected">[LOCAL_SERVICE_CONNECTED]</string>
-    <string name="local_service_disconnected">[LOCAL_SERVICE_DISCONNECTED]</string>
-    <string name="local_service_label">[LOCAL_SERVICE_LABEL]</string>
+    <string name="local_service_started">Tuner is running</string>
+    <string name="local_service_stopped">Tuner has stopped</string>
+    <string name="local_service_connected">Tuner has connected</string>
+    <string name="local_service_disconnected">Tuner has disconnected</string>
+    <string name="local_service_label">Tuner</string>
 
 </resources>

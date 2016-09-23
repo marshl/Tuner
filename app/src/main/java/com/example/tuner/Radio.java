@@ -39,8 +39,6 @@ public class Radio {
         Collections.shuffle(this.advertList);
         Collections.shuffle(this.newsList);
         Collections.shuffle(this.weatherList);
-
-        this.currentStation = this.stationList.get(0);
     }
 
     public boolean hasSongOverlays() {

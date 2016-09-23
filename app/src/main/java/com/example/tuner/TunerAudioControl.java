@@ -2,7 +2,6 @@ package com.example.tuner;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -10,8 +9,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Binder;
 import android.os.IBinder;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,15 +18,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TunerAudioControl extends Service {
-    public RadioMaster radioMaster;
-    public TunerMain context;
-    private boolean isPlaying = true;
+    private boolean isPlaying = false;
     private SoundFileList soundFileList;
     private List<MediaPlayer> mediaPlayerList = new ArrayList<MediaPlayer>();
     private MediaPlayer pausedPlayer;
 
+    private static TunerAudioControl instance;
+
+    public TunerAudioControl() {
+        TunerAudioControl.instance = this;
+    }
+
+    public static TunerAudioControl getInstance() {
+        return TunerAudioControl.instance;
+    }
+
     public void playNextItem(boolean reset) throws IOException {
-        SoundFileList fileList = this.radioMaster.getNextFileBlock(this.radioMaster.getRandomSoundType(reset));
+        RadioMaster.SOUND_TYPE soundType = RadioMaster.getInstance().getRandomSoundType(reset);
+        SoundFileList fileList = RadioMaster.getInstance().getNextFileBlock(soundType);
         this.playSoundList(fileList, reset);
     }
 
@@ -83,8 +89,6 @@ public class TunerAudioControl extends Service {
                 }
             }
         });
-
-        this.context.onSoundItemChange();
     }
 
     public void pause() {
@@ -101,14 +105,11 @@ public class TunerAudioControl extends Service {
     }
 
     public void resume() {
-        if (this.isPlaying) {
+        if (this.isPlaying || this.pausedPlayer == null) {
             return;
         }
 
         this.isPlaying = true;
-
-        assert (this.pausedPlayer != null);
-
         this.pausedPlayer.start();
         this.pausedPlayer = null;
     }
@@ -159,7 +160,7 @@ public class TunerAudioControl extends Service {
         @Override
         public void onPrepared(MediaPlayer _mediaPlayer) {
 
-            if (this.isResetting && this.audioControl.radioMaster.getCurrentRadio().getCurrentStation().getIsFullTrack()) {
+            if (this.isResetting && RadioMaster.getInstance().getCurrentRadio().getCurrentStation().getIsFullTrack()) {
                 _mediaPlayer.seekTo((int) (Math.random() * _mediaPlayer.getDuration()));
             }
             _mediaPlayer.start();
@@ -178,10 +179,6 @@ public class TunerAudioControl extends Service {
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.local_service_started);
 
-        // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, TunerMain.class), 0);
-
         // Set the info for the views that show in the notification panel.
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)  // the status icon
@@ -189,7 +186,6 @@ public class TunerAudioControl extends Service {
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
                 .setContentText(text)  // the contents of the entry
-                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .build();
 
         // Send the notification.

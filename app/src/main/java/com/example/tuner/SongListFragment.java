@@ -34,7 +34,7 @@ public class SongListFragment extends DialogFragment {
         if (this.getArguments() != null) {
             int radioIndex = getArguments().getInt(RADIO_ID_PARAM);
             int stationIndex = getArguments().getInt(STATION_ID_PARAM);
-            this.station = RadioMaster.instance.getRadio(radioIndex).getStation(stationIndex);
+            this.station = RadioMaster.getInstance().getRadio(radioIndex).getStation(stationIndex);
         }
     }
 

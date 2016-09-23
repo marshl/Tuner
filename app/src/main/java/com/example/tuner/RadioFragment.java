@@ -34,7 +34,7 @@ public class RadioFragment extends Fragment {
 
         if (this.getArguments() != null) {
             int radioIndex = this.getArguments().getInt(RADIO_ID_PARAM);
-            this.radio = RadioMaster.instance.getRadio(radioIndex);
+            this.radio = RadioMaster.getInstance().getRadio(radioIndex);
             Log.d("TNR", "Creating radio fragment for " + this.radio.getName());
         }
     }

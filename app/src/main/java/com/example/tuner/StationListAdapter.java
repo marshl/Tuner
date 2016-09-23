@@ -149,13 +149,14 @@ public class StationListAdapter implements ListAdapter {
                 this.radio.setCurrentStation(this.station);
 
                 try {
-                    ((TunerMain)this.context).audioService.playNextItem(true);
+                    TunerAudioControl.getInstance().playNextItem(true);
                 } catch (Exception _e) {
                     CustomLog.appendException(_e);
                     _e.printStackTrace();
                     throw new RuntimeException(_e);
                 }
             }
+
             Log.d("TNR", this.station.getName() + " was just clicked");
             this.listView.invalidate();
             ((TunerMain)context).onSoundItemChange();

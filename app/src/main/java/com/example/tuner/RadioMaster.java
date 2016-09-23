@@ -13,14 +13,18 @@ import java.util.Collections;
 import java.util.Random;
 
 public class RadioMaster {
-    public static RadioMaster instance;
+    private static RadioMaster instance;
     private SOUND_TYPE lastPlayedSoundType = SOUND_TYPE.SONG;
 
     private final ArrayList<Radio> radioList = new ArrayList<Radio>();
     private Radio currentRadio;
 
     public RadioMaster() {
-        instance = this;
+        RadioMaster.instance = this;
+    }
+
+    public static RadioMaster getInstance() {
+        return RadioMaster.instance;
     }
 
     public static void skip(XmlPullParser _parser) throws XmlPullParserException, IOException {
@@ -67,8 +71,6 @@ public class RadioMaster {
                 Log.w("TNR", "Radio folder " + radioDir.toString() + " does not exist");
             }
         }
-
-        this.currentRadio = this.radioList.get(0);
     }
 
     public Radio getCurrentRadio() {
